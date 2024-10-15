@@ -11,16 +11,17 @@
 _✨ NoneBot 插件简单描述 ✨_
 
 
-
 </div>
+<h4 align="center">✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_blank">LittlePaimon</a>的帮助插件✨</h4>
 
-这是一个 nonebot2 插件项目的模板库, 你可以直接使用本模板创建你的 nonebot2 插件项目的仓库
 
 
 
 ## 📖 介绍
 
-这里是插件的详细介绍部分
+LittlePaimon帮助插件真好用，为什么不独立出来呢（？
+
+（~~因为直接照搬，有问题请多多指出~~）
 
 ## 💿 安装
 
@@ -79,3 +80,5 @@ _✨ NoneBot 插件简单描述 ✨_
 |:-----:|:----:|:----:|:----:|:----:|
 | help | 所有 | 否 | 全部 | 打开所有帮助 |
 
+## 丨💸鸣谢
+- 来自[LittlePaimon](https://github.com/CMHopeSunshine/LittlePaimon)帮助插件代码
