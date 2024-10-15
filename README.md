@@ -1,7 +1,7 @@
 <div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-pmhelp/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/A-kirami/nonebot-plugin-template/blob/resources/nbp_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
   <br>
-  <p><img src="https://github.com/A-kirami/nonebot-plugin-pmhelp/blob/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
+  <p><img src="https://github.com/A-kirami/nonebot-plugin-template/blob/resources/NoneBotPlugin.svg" width="240" alt="NoneBotPluginText"></p>
 </div>
 
 <div align="center">
@@ -11,13 +11,6 @@
 _✨ NoneBot 插件简单描述 ✨_
 
 
-<a href="./LICENSE">
-    <img src="https://img.shields.io/github/license/owner/nonebot-plugin-pmhelp.svg" alt="license">
-</a>
-<a href="https://pypi.python.org/pypi/nonebot-plugin-pmhelp">
-    <img src="https://img.shields.io/pypi/v/nonebot-plugin-pmhelp.svg" alt="pypi">
-</a>
-<img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="python">
 
 </div>
 
@@ -78,6 +71,7 @@ _✨ NoneBot 插件简单描述 ✨_
 |:-----:|:----:|:----:|:----:|
 | img_cache | 否 | True | 图片资源缓存开关 |
 | github_proxy | 否 | https://gitdl.cn/ | 资源下载代理 |
+| __version__ | 否 | 11.45.14 | 版本号 |
 
 ## 🎉 使用
 ### 指令表
