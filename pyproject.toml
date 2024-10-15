@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "nonebot-plugin-pmhelp"
+version = "0.1.0"
+description = "提取于LittlePaimon的帮助插件"
+authors = ["CM-Edelweiss <2633668472@qq.com>"]
+readme = "README.md"
+
+[[tool.poetry.source]]
+name = "aliyun"
+default = true
+url = "https://mirrors.aliyun.com/pypi/simple/"
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+nonebot2 = {extras = ["fastapi"], version = "^2.0.0-rc.2"}
+nonebot-adapter-onebot = "^2.1"
+httpx = "^0.23.0"
+Pillow = "^9.1.0"
+matplotlib = "^3.5.1"
+tqdm = "^4.64.0"
+tortoise-orm = "^0.19.2"
+"ruamel.yaml" = "^0.17.21"
+
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
