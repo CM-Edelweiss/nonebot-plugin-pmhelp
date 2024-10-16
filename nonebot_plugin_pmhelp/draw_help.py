@@ -5,7 +5,7 @@ from .plugin.manage import PluginInfo
 from .image import PMImage, font_manager as fm, load_image, MessageBuild_Image
 
 from .Path import IMAGE_PATH
-from .Config import Config
+from .pm_config import Config
 
 
 async def draw_plugin_card(plugin: PluginInfo):

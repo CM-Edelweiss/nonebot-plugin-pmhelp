@@ -8,7 +8,7 @@ from PIL.ImageFont import FreeTypeFont
 from nonebot.utils import run_sync
 from .Path import FONTS_PATH
 
-from .Config import Config
+from .pm_config import Config
 
 plt.switch_backend('agg')
 

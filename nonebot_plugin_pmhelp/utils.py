@@ -13,7 +13,7 @@ from nonebot.adapters.onebot.v11 import Message
 
 from .logger import logger
 from .Path import IMAGE_PATH, FONTS_PATH
-from .Config import Config
+from .pm_config import Config
 
 DRIVER = get_driver()
 try:
