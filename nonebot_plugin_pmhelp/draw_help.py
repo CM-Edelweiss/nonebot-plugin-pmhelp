@@ -37,7 +37,7 @@ async def draw_help(plugin_list: List[PluginInfo]):
     await img.text('NoneBot帮助', 38, 40, fm.get('SourceHanSerifCN-Bold.otf', 72), 'black')
     await img.text(f'V{config.pm_version}', 1040, 75, fm.get('bahnschrift_regular', 36), 'black', 'right')
     await img.text('<>内为必须，[]内为可选', 1040, 105, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
-    # await img.text('文本', 1040, 130, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
+    await img.text(config.pm_text, 1040, 130, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
 
     height_now = 172
     for plugin in plugin_list:

@@ -9,6 +9,8 @@ class Config(BaseModel):
     github_proxy: str = 'https://gitdl.cn/'
     # 版本
     pm_version: str = "11.45.14"
+    # 自定义文本
+    pm_text: str = "自定义文本"
 
 
 config: Config = get_plugin_config(Config)

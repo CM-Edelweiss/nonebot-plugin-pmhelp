@@ -18,10 +18,11 @@ _✨ NoneBot 插件简单描述 ✨_
 
 
 ## 📖 介绍
+虽然LittlePaimon不再维护了，但是 [@CMHopeSunshine](https://github.com/CMHopeSunshine) 的帮助插件真好用
 
-LittlePaimon帮助插件真好用，为什么不独立出来呢（？
+故把LittlePaimon帮助插件独立出来
 
-（~~因为直接照搬，有问题请多多指出~~）
+（~~因为直接照搬，有问题请pr~~）
 
 ## 💿 安装
 

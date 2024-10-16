@@ -8,23 +8,22 @@ from nonebot.params import RegexDict
 import asyncio
 from nonebot.typing import T_State
 
-from .utils import SUPERUSERS, CommandObjectID, fullmatch_rule, check_resource
+from .utils import SUPERUSERS, DRIVER, CommandObjectID, fullmatch_rule, check_resource
 from .plugin.manage import PluginManager
 from .models.manage import PluginDisable
 from .logger import logger
 from .draw_help import draw_help
-from nonebot import get_driver
 from .models import connect, disconnect
 from .config import config
 from nonebot.plugin import PluginMetadata
 
 
 __plugin_meta__ = PluginMetadata(
-    name='pm帮助',
-    description='整理所有帮助',
+    name='PM帮助',
+    description='根据加载的nonebot2插件自动生成帮助图，源自LittlePaimon',
     usage='help',
     type="application",
-    homepage="",
+    homepage="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp",
     config=config,
     extra={
         'author': 'CM-Edelweiss',
@@ -32,8 +31,6 @@ __plugin_meta__ = PluginMetadata(
         'priority': 1,
     },
 )
-
-DRIVER = get_driver()
 
 
 @DRIVER.on_startup
