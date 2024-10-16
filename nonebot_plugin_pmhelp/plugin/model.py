@@ -1,6 +1,9 @@
 from typing import Optional, List
 
-from pydantic.v1 import BaseModel
+try:
+    from pydantic.v1 import BaseModel
+except:
+    from pydantic import BaseModel
 
 
 class MatcherInfo(BaseModel):

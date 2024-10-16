@@ -35,7 +35,7 @@ async def draw_help(plugin_list: List[PluginInfo]):
     orange_bord = await load_image(IMAGE_PATH / 'orange_bord.png')
     black_bord = await load_image(IMAGE_PATH / 'black_bord.png')
     await img.text('NoneBot帮助', 38, 40, fm.get('SourceHanSerifCN-Bold.otf', 72), 'black')
-    await img.text(f'V{config.__version__}', 1040, 75, fm.get('bahnschrift_regular', 36), 'black', 'right')
+    await img.text(f'V{config.pm_version}', 1040, 75, fm.get('bahnschrift_regular', 36), 'black', 'right')
     await img.text('<>内为必须，[]内为可选', 1040, 105, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
     # await img.text('文本', 1040, 130, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
 
@@ -80,7 +80,7 @@ async def draw_help(plugin_list: List[PluginInfo]):
             await img.text_box(plugin.usage.replace('\n', '^'), (50, 1030), (height_now + 10, height_now + text_height - 10), fm.get('SourceHanSansCN-Bold.otf', 18), '#40342d')
             height_now += matcher_card.height + 6
         height_now += 19
-    await img.text('CREATED BY NoneBot2', (0, 1080), height_now + 8, fm.get('SourceHanSerifCN-Bold.otf', 24), 'black', 'center')
+    await img.text('CREATED BY NoneBot2 / CM-Edelweiss / CMHopeSunshine', (0, 1080), height_now + 8, fm.get('SourceHanSerifCN-Bold.otf', 24), 'black', 'center')
     height_now += 70
     await bg.stretch((50, bg.height - 50), height_now - 100, 'height')
     await bg.paste(img, (0, 0))
