@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/docs_image/nb_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/blob/main/docs_image/nb_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
 
 </div>
 
@@ -59,9 +59,9 @@
 ## 📋 效果
 
 帮助图(举例) <br>
-![_](https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/docs_image/1.jpg)<br>
+![_](https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/blob/main/docs_image/1.jpg)<br>
 被禁用对应变黑(全部禁用)<br>
-![_](https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/docs_image/2.jpg)<br>
+![_](https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/blob/main/docs_image/2.jpg)<br>
 
 
 
