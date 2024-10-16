@@ -14,6 +14,7 @@ from .models.manage import PluginDisable
 from .logger import logger
 from .draw_help import draw_help
 from .models import connect, disconnect
+from .pm_config import Config
 from nonebot.plugin import PluginMetadata
 
 
@@ -23,6 +24,7 @@ __plugin_meta__ = PluginMetadata(
     usage='help',
     type="application",
     homepage="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp",
+    config=Config,
     supported_adapters={"~onebot.v11"},
     extra={
         'author': 'CM-Edelweiss',
