@@ -8,7 +8,7 @@ from PIL.ImageFont import FreeTypeFont
 from nonebot.utils import run_sync
 from .Path import FONTS_PATH
 
-from .config import config
+from .Config import Config
 
 plt.switch_backend('agg')
 
@@ -298,14 +298,14 @@ async def load_image(
     :return: 图像对象
     """
     path = Path(path)
-    if config.img_cache and str(path) in cache_image:
+    if Config.img_cache and str(path) in cache_image:
         img = cache_image[str(path)]
     else:
         if path.exists():
             img = Image.open(path)
         else:
             raise FileNotFoundError(f'{path} not found')
-        if config.img_cache:
+        if Config.img_cache:
             cache_image[str(path)] = img
         elif cache_image:
             cache_image.clear()

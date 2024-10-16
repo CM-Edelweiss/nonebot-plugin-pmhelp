@@ -13,7 +13,7 @@ from nonebot.adapters.onebot.v11 import Message
 
 from .logger import logger
 from .Path import IMAGE_PATH, FONTS_PATH
-from .config import config
+from .Config import Config
 
 DRIVER = get_driver()
 try:
@@ -189,7 +189,7 @@ async def check_resource():
             pass
         else:
             try:
-                await download(url=f'{config.github_proxy}https://raw.githubusercontent.com/CM-Edelweiss/help_resources/refs/heads/main/fonts/{font}', save_path=FONTS_PATH / font)
+                await download(url=f'{Config.github_proxy}https://raw.githubusercontent.com/CM-Edelweiss/help_resources/refs/heads/main/fonts/{font}', save_path=FONTS_PATH / font)
             except Exception as e:
                 logger.warning(
                     '资源检查', f'下载<m>{font}</m>时<r>出错</r>，请尝试更换<m>github资源地址</m>{e}')
@@ -199,7 +199,7 @@ async def check_resource():
             pass
         else:
             try:
-                await download(url=f'{config.github_proxy}https://raw.githubusercontent.com/CM-Edelweiss/help_resources/refs/heads/main/general/{general}', save_path=IMAGE_PATH / general)
+                await download(url=f'{Config.github_proxy}https://raw.githubusercontent.com/CM-Edelweiss/help_resources/refs/heads/main/general/{general}', save_path=IMAGE_PATH / general)
             except Exception as e:
                 logger.warning(
                     '资源检查', f'下载<m>{general}</m>时<r>出错</r>，请尝试更换<m>github资源地址</m>{e}')
