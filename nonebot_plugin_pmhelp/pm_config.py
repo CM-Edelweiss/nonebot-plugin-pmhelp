@@ -13,4 +13,4 @@ class Config(BaseModel):
     pm_text: str = "自定义文本"
 
 
-config: Config = get_plugin_config(Config)
+Pm_config: Config = get_plugin_config(Config)

@@ -5,7 +5,7 @@ from .plugin.manage import PluginInfo
 from .image import PMImage, font_manager as fm, load_image, MessageBuild_Image
 
 from .Path import IMAGE_PATH
-from .pm_config import Config
+from .pm_config import Pm_config
 
 
 async def draw_plugin_card(plugin: PluginInfo):
@@ -35,9 +35,9 @@ async def draw_help(plugin_list: List[PluginInfo]):
     orange_bord = await load_image(IMAGE_PATH / 'orange_bord.png')
     black_bord = await load_image(IMAGE_PATH / 'black_bord.png')
     await img.text('NoneBot帮助', 38, 40, fm.get('SourceHanSerifCN-Bold.otf', 72), 'black')
-    await img.text(f'V{Config.pm_version}', 1040, 75, fm.get('bahnschrift_regular', 36), 'black', 'right')
+    await img.text(f'V{Pm_config.pm_version}', 1040, 75, fm.get('bahnschrift_regular', 36), 'black', 'right')
     await img.text('<>内为必须，[]内为可选', 1040, 105, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
-    await img.text(Config.pm_text, 1040, 130, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
+    await img.text(Pm_config.pm_text, 1040, 130, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
 
     height_now = 172
     for plugin in plugin_list:
