@@ -1,4 +1,3 @@
-import asyncio
 from nonebot import on_regex, on_command
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
@@ -14,7 +13,6 @@ from .utils import (
     DRIVER,
     CommandObjectID,
     fullmatch_rule,
-    check_resource,
 )
 from .plugin.manage import PluginManager
 from .models import PluginDisable
@@ -42,7 +40,6 @@ __plugin_meta__ = PluginMetadata(
 @DRIVER.on_startup
 async def startup():
     await PluginManager.init()
-    asyncio.ensure_future(check_resource())
 
 
 manage_cmd = on_regex(

@@ -29,7 +29,7 @@ async def draw_help(plugin_list: List[PluginInfo]):
                   color=(255, 255, 255, 0), mode='RGBA')
     orange_line = await load_image(IMAGE_PATH / 'orange.png')
     orange_name_bg = await load_image(IMAGE_PATH / 'orange_card.png')
-    black_line = await load_image(IMAGE_PATH / 'black2.png')
+    black_line = await load_image(IMAGE_PATH / 'black.png')
     black_name_bg = await load_image(IMAGE_PATH / 'black_card2.png')
     orange_bord = await load_image(IMAGE_PATH / 'orange_bord.png')
     black_bord = await load_image(IMAGE_PATH / 'black_bord.png')

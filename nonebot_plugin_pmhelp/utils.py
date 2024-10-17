@@ -1,6 +1,5 @@
 from io import BytesIO
 import httpx
-import tqdm.asyncio
 from ruamel.yaml import YAML
 from ssl import SSLCertVerificationError
 from pathlib import Path
@@ -10,10 +9,6 @@ from nonebot.rule import Rule
 from nonebot.params import CommandArg, Depends
 from nonebot import get_driver
 from nonebot.adapters.onebot.v11 import Message
-
-from .logger import logger
-from .Path import IMAGE_PATH, FONTS_PATH
-from .pm_config import Pm_config
 
 DRIVER = get_driver()
 try:
@@ -150,56 +145,3 @@ async def get_img(url: str,
         save_path.parent.mkdir(parents=True, exist_ok=True)
         img.save(save_path)
     return img
-
-
-async def download(url: str, save_path: Path, exclude_json: bool = False):
-    """
-    下载文件(带进度条)
-
-    :param url: url
-    :param save_path: 保存路径
-    :param exclude_json: 是否排除json文件
-    """
-    save_path.parent.mkdir(parents=True, exist_ok=True)
-    async with httpx.AsyncClient().stream(method='GET', url=url, follow_redirects=True) as datas:
-        if exclude_json and 'application/json' in str(datas.headers['Content-Type']):
-            raise Exception('file not match type')
-        size = int(datas.headers['Content-Length'])
-        f = save_path.open('wb')
-        async for chunk in tqdm.asyncio.tqdm(iterable=datas.aiter_bytes(1),
-                                             desc=url.split('/')[-1],
-                                             unit='iB',
-                                             unit_scale=True,
-                                             unit_divisor=1024,
-                                             total=size,
-                                             colour='green'):
-            f.write(chunk)
-        f.close()
-
-
-fonts = ["bahnschrift_regular.ttf",
-         "SourceHanSansCN-Bold.otf", "SourceHanSerifCN-Bold.otf"]
-generals = ["bg.png", "black_bord.png", "black_card2.png",
-            "black2.png", "orange_bord.png", "orange_card.png", "orange.png"]
-
-
-async def check_resource():
-    for font in fonts:
-        if (FONTS_PATH / font).exists() and (FONTS_PATH / font).is_file():
-            pass
-        else:
-            try:
-                await download(url=f'{Pm_config.github_proxy}https://raw.githubusercontent.com/CM-Edelweiss/help_resources/refs/heads/main/fonts/{font}', save_path=FONTS_PATH / font)
-            except Exception as e:
-                logger.warning(
-                    '资源检查', f'下载<m>{font}</m>时<r>出错</r>，请尝试更换<m>github资源地址</m>{e}')
-
-    for general in generals:
-        if (IMAGE_PATH / general).exists() and (IMAGE_PATH / general).is_file():
-            pass
-        else:
-            try:
-                await download(url=f'{Pm_config.github_proxy}https://raw.githubusercontent.com/CM-Edelweiss/help_resources/refs/heads/main/general/{general}', save_path=IMAGE_PATH / general)
-            except Exception as e:
-                logger.warning(
-                    '资源检查', f'下载<m>{general}</m>时<r>出错</r>，请尝试更换<m>github资源地址</m>{e}')
