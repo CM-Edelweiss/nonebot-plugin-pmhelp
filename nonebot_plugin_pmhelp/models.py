@@ -1,8 +1,16 @@
-import datetime
-from typing import List
-
-from tortoise import fields
 from tortoise.models import Model
+from tortoise import fields
+from typing import List
+import datetime
+from nonebot_plugin_tortoise_orm import add_model
+
+from .Path import MANAGER_DB_PATH
+
+add_model(
+    __name__,
+    db_name="pmhelp",
+    db_url=f"sqlite://{MANAGER_DB_PATH}",
+)
 
 
 class PluginPermission(Model):

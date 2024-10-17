@@ -9,10 +9,9 @@ from nonebot.matcher import Matcher
 from nonebot.message import run_preprocessor
 from tortoise.queryset import Q
 
-from ..models.manage import PluginPermission, PluginStatistics, PluginDisable
+from ..models import PluginPermission, PluginStatistics, PluginDisable
 from ..logger import logger
 from ..utils import SUPERUSERS, load_yaml, save_yaml
-
 from ..Path import PLUGIN_CONFIG
 from .model import MatcherInfo, PluginInfo
 

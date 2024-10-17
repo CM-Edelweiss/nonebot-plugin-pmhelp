@@ -1,21 +1,24 @@
-from nonebot import on_regex, on_command
+import asyncio
+from nonebot import on_regex, on_command, require
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     PrivateMessageEvent,
     MessageEvent,
 )
 from nonebot.params import RegexDict
-import asyncio
 from nonebot.typing import T_State
 
 from .utils import SUPERUSERS, DRIVER, CommandObjectID, fullmatch_rule, check_resource
 from .plugin.manage import PluginManager
-from .models.manage import PluginDisable
+from .models import PluginDisable
 from .logger import logger
 from .draw_help import draw_help
-from .models import connect, disconnect
 from .pm_config import Config
 from nonebot.plugin import PluginMetadata
+
+
+require("nonebot_plugin_localstore")
+require("nonebot_plugin_tortoise_orm")
 
 
 __plugin_meta__ = PluginMetadata(
@@ -36,11 +39,9 @@ __plugin_meta__ = PluginMetadata(
 
 @DRIVER.on_startup
 async def startup():
-    await connect()
     await PluginManager.init()
     asyncio.ensure_future(check_resource())
 
-DRIVER.on_shutdown(disconnect)
 
 manage_cmd = on_regex(
     r"^pm (?P<func>ban|unban) (?P<plugin>([\w ]*)|all|全部) ?(-g (?P<group>[\d ]*) ?)?(-u (?P<user>[\d ]*) ?)?",

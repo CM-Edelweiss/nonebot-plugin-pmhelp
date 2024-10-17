@@ -1,13 +1,13 @@
 from io import BytesIO
 from pathlib import Path
-from typing import Tuple, Union, Literal, Optional, Dict, Any
+from nonebot.utils import run_sync
 from nonebot.adapters.onebot.v11 import MessageSegment
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 from PIL.ImageFont import FreeTypeFont
-from nonebot.utils import run_sync
-from .Path import FONTS_PATH
+from typing import Tuple, Union, Literal, Optional, Dict, Any
 
+from .Path import FONTS_PATH
 from .pm_config import Pm_config
 
 plt.switch_backend('agg')
@@ -263,7 +263,8 @@ class FontManager:
         if font_name not in self.fonts:
             font_name = font_name.replace('.ttf', '.ttc')
         if font_name not in self.fonts:
-            raise FileNotFoundError(f'不存在字体文件 {font_name} ，请补充至字体资源中')
+            raise FileNotFoundError(
+                f'不存在字体文件 {font_name} ，请补充至字体资源中,资源第一次下载请重启应用')
         if f'{font_name}-{size}' in self.fonts_cache:
             font = self.fonts_cache[f'{font_name}-{size}']
         else:

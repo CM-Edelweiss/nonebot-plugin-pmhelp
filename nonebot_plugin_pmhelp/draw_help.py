@@ -3,7 +3,6 @@ from typing import List
 
 from .plugin.manage import PluginInfo
 from .image import PMImage, font_manager as fm, load_image, MessageBuild_Image
-
 from .Path import IMAGE_PATH
 from .pm_config import Pm_config
 
