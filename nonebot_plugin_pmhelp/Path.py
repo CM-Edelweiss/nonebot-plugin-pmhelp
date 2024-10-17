@@ -1,5 +1,8 @@
-import nonebot_plugin_localstore as store
 from pathlib import Path
+from nonebot import require
+#先导入(注意格式化移动)
+require("nonebot_plugin_localstore")
+import nonebot_plugin_localstore as store
 
 
 # 资源路径

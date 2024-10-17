@@ -2,6 +2,9 @@ from tortoise.models import Model
 from tortoise import fields
 from typing import List
 import datetime
+from nonebot import require
+#先导入(注意格式化移动)
+require("nonebot_plugin_tortoise_orm")
 from nonebot_plugin_tortoise_orm import add_model
 
 from .Path import MANAGER_DB_PATH

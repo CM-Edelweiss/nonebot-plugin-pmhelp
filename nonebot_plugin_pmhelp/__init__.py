@@ -1,5 +1,5 @@
 import asyncio
-from nonebot import on_regex, on_command, require
+from nonebot import on_regex, on_command
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     PrivateMessageEvent,
@@ -7,18 +7,20 @@ from nonebot.adapters.onebot.v11 import (
 )
 from nonebot.params import RegexDict
 from nonebot.typing import T_State
+from nonebot.plugin import PluginMetadata
 
-from .utils import SUPERUSERS, DRIVER, CommandObjectID, fullmatch_rule, check_resource
+from .utils import (
+    SUPERUSERS,
+    DRIVER,
+    CommandObjectID,
+    fullmatch_rule,
+    check_resource,
+)
 from .plugin.manage import PluginManager
 from .models import PluginDisable
 from .logger import logger
 from .draw_help import draw_help
 from .pm_config import Config
-from nonebot.plugin import PluginMetadata
-
-
-require("nonebot_plugin_localstore")
-require("nonebot_plugin_tortoise_orm")
 
 
 __plugin_meta__ = PluginMetadata(
@@ -32,7 +34,7 @@ __plugin_meta__ = PluginMetadata(
     extra={
         'author': 'CM-Edelweiss',
         'version': '1.0',
-        'priority': 1,
+        'priority': 3,
     },
 )
 
