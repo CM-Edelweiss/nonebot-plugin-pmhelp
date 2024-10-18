@@ -71,17 +71,18 @@
 
 | 配置项 | 必填 | 默认值 | 说明 |
 |:-----:|:----:|:----:|:----:|
-| img_cache | 否 | True | 图片资源缓存开关 |
-| pm_version | 否 | 11.45.14 | 版本号 |
-| pm_text| 否 | 自定义文本 | 自定义文本 |
+| img_cache | 否 | True | 图片资源缓存开关(无需引号) |
+| pm_version | 否 | "11.45.14" | 帮助显示的版本号 |
+| pm_text| 否 | "自定义文本" | 自定义文本 |
+| pm_plugin| 否 | "1" | 管理插件文件的位置(1为统一目录，2为机器人目录，3为自定义目录) |
+| pm_path| 否 | 无 | pm_plugin为3时的目录(无需引号) |
 
-nonebot2插件生成帮助图位于config\plugins下
-
+nonebot2插件生成帮助图位于{帮助文件目录}/pm_config下
 
 ```python
 举例(xxx.yml):
 description: 根据加载的nonebot2...   #插件介绍
-matchers:                           #帮助图展示的指令卡片
+matchers:                           #帮助图展示的指令卡片(可能需要自行配置)
 - {pm_description: 禁用|取消...,     #介绍
     pm_name: pm-ban|unban,          #此帮助名
     pm_priority: 1,                 #优先级
