@@ -20,10 +20,12 @@ from .logger import logger
 from .draw_help import draw_help
 from .pm_config import Config
 
+# 加载web
+from . import web_api, web_page
 
 __plugin_meta__ = PluginMetadata(
     name='PM帮助',
-    description='根据加载的nonebot2插件自动生成帮助图，源自LittlePaimon',
+    description='根据加载的nonebot2插件管理器，可以自动生成帮助图，源自LittlePaimon',
     usage='help',
     type="application",
     homepage="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp",

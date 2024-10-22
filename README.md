@@ -9,10 +9,12 @@
 
 
 </div>
-<h4 align="center">✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_blank">LittlePaimon</a>的帮助插件✨</h4>
+<h4 align="center">✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_blank">LittlePaimon</a>的插件管理器✨</h4>
 
 
 ## 📖 介绍
+
+提供帮助图自动生成和插件权限管理<br><br>
 虽然LittlePaimon不再维护了，但是 [@CMHopeSunshine](https://github.com/CMHopeSunshine) 的帮助插件真好用，所以把LittlePaimon帮助插件独立出来（~~因为直接照搬，有问题请pr~~）
 
 ## 💿 安装
@@ -76,8 +78,15 @@
 | pm_text| 否 | "自定义文本" | 自定义文本 |
 | pm_plugin| 否 | "1" | 管理插件文件的位置(1为统一目录，2为机器人目录，3为自定义目录) |
 | pm_path| 否 | 无 | pm_plugin为3时的目录(无需引号) |
+| pm_enable_web| 否 | True |后台管理开关 |
+| pm_username| 否 | pmhelp |后台管理用户名 |
+| pm_password| 否 | admin | 后台管理密码 |
+| pm_secret_key| 否 | ... | 后台管理token密钥 |
 
-nonebot2插件生成帮助图位于{帮助文件目录}/pm_config下
+
+
+nonebot2插件生成帮助图位于{帮助文件目录}/pm_config下<br>
+或者使用webui进行修改
 
 ```python
 举例(xxx.yml):
@@ -118,9 +127,22 @@ xxx = on_command(
 | 指令 | 权限 | 需要@ | 范围 | 说明 |
 |:-----:|:----:|:----:|:----:|:----:|
 | help | 所有 | 否 | 全部 | 打开所有帮助 |
-| pm ban|unban <插件名> | 管理 | 否 | 全部 | 禁用/取消禁用插件的群/用户使用权限 |
+| pm ban/unban <插件名> | 管理 | 否 | 全部 | 禁用/取消禁用插件的群/用户使用权限 |
 
-
+```python
+命令：pm ban|unban <插件名> -g <群号> -u <用户号>
+参数：
+    ban|unban：禁用/启用
+    <插件名>：可以是中/英文或者all，all表示所有插件，多个插件用空格分隔
+<群号>：
+    默认值：不填时为命令当前群，多个群号用空格分隔
+    权限：群主和群管只能管理本群，超级用户可以管理所有群
+<用户号>：
+    默认值：不填时则为本群所有用户，多个用户用空格分隔
+    权限：群主和群管可以管理本群的用户，超级用户可以管理所有用户
+额外说明：
+    如果要全局禁用/启用某一个用户，需要超级用户私聊Bot来使用命令
+```
 
 ## 丨💸鸣谢
 - 来自[LittlePaimon](https://github.com/CMHopeSunshine/LittlePaimon)帮助插件代码

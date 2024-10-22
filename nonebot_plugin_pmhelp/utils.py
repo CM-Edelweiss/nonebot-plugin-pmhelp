@@ -1,5 +1,8 @@
 from io import BytesIO
 import httpx
+import datetime
+import functools
+import inspect
 from ruamel.yaml import YAML
 from ssl import SSLCertVerificationError
 from pathlib import Path
@@ -67,6 +70,39 @@ def CommandObjectID() -> int:
             return event.channel_id
 
     return Depends(_event_id)
+
+
+def cache(ttl=datetime.timedelta(hours=1)):
+    """
+    缓存装饰器
+        :param ttl: 过期时间
+    """
+
+    def wrap(func):
+        cache_data = {}
+
+        @functools.wraps(func)
+        async def wrapped(*args, **kw):
+            nonlocal cache_data
+            bound = inspect.signature(func).bind(*args, **kw)
+            bound.apply_defaults()
+            ins_key = '|'.join(
+                [f'{k}_{v}' for k, v in bound.arguments.items()])
+            default_data = {"time": None, "value": None}
+            data = cache_data.get(ins_key, default_data)
+            now = datetime.datetime.now()
+            if not data['time'] or now - data['time'] > ttl:
+                try:
+                    data['value'] = await func(*args, **kw)
+                    data['time'] = now
+                    cache_data[ins_key] = data
+                except Exception as e:
+                    raise e
+            return data['value']
+
+        return wrapped
+
+    return wrap
 
 
 def fullmatch(msg: Message = CommandArg()) -> bool:

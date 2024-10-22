@@ -21,6 +21,8 @@ HIDDEN_PLUGINS = [
     'nonebot_plugin_gocqhttp',
     'nonebot_plugin_htmlrender',
     'nonebot_plugin_imageutils',
+    'nonebot_plugin_localstore',
+    'nonebot_plugin_tortoise_orm'
     'NoticeAndRequest'
 ]
 
@@ -31,15 +33,6 @@ class PluginManager:
         if file.is_file() and file.name.endswith('.yml'):
             data = load_yaml(file)
             plugins[file.name.replace('.yml', '')] = PluginInfo.parse_obj(data)
-
-    @classmethod
-    def save(cls):
-        """
-        保存数据
-        """
-        for name, plugin in cls.plugins.items():
-            save_yaml(plugin.dict(exclude={'status'}),
-                      PLUGIN_CONFIG / f'{name}.yml')
 
     @classmethod
     def save(cls):
@@ -121,6 +114,22 @@ class PluginManager:
                                                                user_id=session_id).exists()
             if plugin.matchers:
                 plugin.matchers.sort(key=lambda x: x.pm_priority)
+        return plugin_list
+
+    @classmethod
+    async def get_plugin_list_for_admin(cls) -> List[dict]:
+        """
+        获取插件列表（供Web UI使用）
+        """
+        load_plugins = [p.name for p in nb_plugin.get_loaded_plugins()]
+        plugin_list = [p.dict(exclude={'status'})
+                       for p in cls.plugins.values()]
+        for plugin in plugin_list:
+            plugin['matchers'].sort(key=lambda x: x['pm_priority'])
+            plugin['isLoad'] = plugin['module_name'] in load_plugins
+            plugin['status'] = not await PluginDisable.filter(name=plugin['module_name'], global_disable=True).exists()
+        plugin_list.sort(key=lambda x: (
+            x['isLoad'], x['status'], -x['priority']), reverse=True)
         return plugin_list
 
 
