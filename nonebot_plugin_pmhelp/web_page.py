@@ -4,10 +4,10 @@ from amis import DisplayModeEnum, InputText, Textarea, Switch, \
 
 
 logo = Html(
-    html="""
+    html=f"""
 <p align="center">
     <a href="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/">
-        <img src="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/blob/main/docs_image/nb_logo.png"
+        <img src="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/raw/refs/heads/main/docs_image/nb_logo.png"
          width="256" height="256" alt="PMHELP">
     </a>
 </p>

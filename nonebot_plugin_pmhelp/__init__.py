@@ -19,6 +19,7 @@ from .models import PluginDisable
 from .logger import logger
 from .draw_help import draw_help
 from .pm_config import Config
+from .utils import cache_help
 
 # 加载web
 from . import web_api, web_page
@@ -68,8 +69,6 @@ help_cmd = on_command(
         "pm_priority": 2,
     },
 )
-
-cache_help = {}
 
 
 @manage_cmd.handle()

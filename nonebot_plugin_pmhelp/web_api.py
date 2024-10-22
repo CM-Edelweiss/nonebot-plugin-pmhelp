@@ -159,7 +159,7 @@ async def init_web():
         module_name: str = data.get('plugin')
         status: bool = data.get('status')
         try:
-            from .__init__ import cache_help
+            from .utils import cache_help
             cache_help.clear()
         except Exception:
             pass
@@ -170,7 +170,7 @@ async def init_web():
         return {'status': 0, 'msg': f'成功设置{module_name}插件状态为{status}'}
 
     @app.get('/pmhelp/api/get_plugin_bans', response_class=JSONResponse, dependencies=[authentication()])
-    async def get_plugin_status(module_name: str):
+    async def get_plugin_bans(module_name: str):
         result = []
         bans = await PluginDisable.filter(name=module_name).all()
         for ban in bans:
@@ -205,7 +205,7 @@ async def init_web():
             else:
                 await PluginDisable.create(name=name, user_id=int(ban))
         try:
-            from .__init__ import cache_help
+            from .utils import cache_help
             cache_help.clear()
         except Exception:
             pass
@@ -219,7 +219,7 @@ async def init_web():
         PluginManager.plugins[plugin_info.module_name] = plugin_info
         PluginManager.save()
         try:
-            from .__init__ import cache_help
+            from .utils import cache_help
             cache_help.clear()
         except Exception:
             pass

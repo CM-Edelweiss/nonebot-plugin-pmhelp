@@ -13,6 +13,9 @@ from nonebot.params import CommandArg, Depends
 from nonebot import get_driver
 from nonebot.adapters.onebot.v11 import Message
 
+#图片缓存
+cache_help = {}
+
 DRIVER = get_driver()
 try:
     SUPERUSERS: List[int] = [int(s) for s in DRIVER.config.superusers]
