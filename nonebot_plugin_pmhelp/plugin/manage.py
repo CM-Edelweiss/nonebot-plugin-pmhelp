@@ -3,17 +3,18 @@ import datetime
 from typing import Dict, List
 
 from nonebot import plugin as nb_plugin
-from nonebot.adapters.onebot.v11 import MessageEvent, PrivateMessageEvent, GroupMessageEvent
+from nonebot.adapters.onebot.v11 import MessageEvent, PrivateMessageEvent, GroupMessageEvent, Bot
 from nonebot.exception import IgnoredException
 from nonebot.matcher import Matcher
 from nonebot.message import run_preprocessor
 from tortoise.queryset import Q
 
-from ..models import PluginPermission, PluginStatistics, PluginDisable
+from ..models import PluginPermission, PluginStatistics, PluginDisable, PluginTime
 from ..logger import logger
-from ..utils import SUPERUSERS, load_yaml, save_yaml
+from ..utils import SUPERUSERS, load_yaml, save_yaml, freqLimiter
 from ..Path import PLUGIN_CONFIG
 from .model import MatcherInfo, PluginInfo
+from ..pm_config import Pm_config
 
 HIDDEN_PLUGINS = [
     'config',
@@ -134,7 +135,7 @@ class PluginManager:
 
 
 @run_preprocessor
-async def _(event: MessageEvent, matcher: Matcher):
+async def _(event: MessageEvent, bot: Bot, matcher: Matcher):
     if event.user_id in SUPERUSERS:
         return
     if not matcher.plugin_name or matcher.plugin_name in HIDDEN_PLUGINS:
@@ -144,7 +145,9 @@ async def _(event: MessageEvent, matcher: Matcher):
 
     # 权限检查
     is_ignored = False
+    message_bool = False
     try:
+        # 禁用
         if await PluginDisable.get_or_none(name=matcher.plugin_name, global_disable=True):
             is_ignored = True
         if await PluginDisable.get_or_none(name=matcher.plugin_name, user_id=event.user_id, group_id=None):
@@ -154,11 +157,38 @@ async def _(event: MessageEvent, matcher: Matcher):
             user_ids = [p.user_id for p in perms]
             if None in user_ids or event.user_id in user_ids:
                 is_ignored = True
+        # 限流
+        if id := await PluginTime.get_or_none(name=matcher.plugin_name, user_id=event.user_id, group_id=None):
+            if freqLimiter.check(f'{matcher.plugin_name}-{event.user_id}'):
+                freqLimiter.start(
+                    f'{matcher.plugin_name}-{event.user_id}', id.time)
+            else:
+                msg = f'{matcher.plugin_name}冷却ing...剩余{freqLimiter.left(f"{matcher.plugin_name}-{event.user_id}")}秒'
+                is_ignored = message_bool = True
+        elif isinstance(event, GroupMessageEvent) and (
+                perms := await PluginTime.filter(name=matcher.plugin_name, group_id=event.group_id)):
+            user_ids = {}
+            for p in perms:
+                if (p.user_id == None) and (id := await PluginTime.get_or_none(name=matcher.plugin_name, user_id=None, group_id=event.group_id)):
+                    user_ids[event.user_id] = id.time
+                else:
+                    user_ids[p.user_id] = p.time
+            if None in user_ids or event.user_id in user_ids:
+                if freqLimiter.check(f'{matcher.plugin_name}-{event.group_id}-{event.user_id}'):
+                    freqLimiter.start(
+                        f'{matcher.plugin_name}-{event.group_id}-{event.user_id}',  user_ids[event.user_id])
+                else:
+                    msg = f'{matcher.plugin_name}冷却ing...剩余{freqLimiter.left(f"{matcher.plugin_name}-{event.group_id}-{event.user_id}")}秒'
+                    is_ignored = message_bool = True
     except Exception as e:
         logger.info('插件管理器', f'插件权限检查<r>失败：{e}</r>')
 
+    if message_bool and Pm_config.pm_message and msg:
+        await bot.send(event=event, message=msg, reply_message=True)
+
     if is_ignored:
         raise IgnoredException('插件使用权限已禁用')
+
     with contextlib.suppress(Exception):
         # 命令调用统计
         if matcher.plugin_name in PluginManager.plugins and 'pm_name' in matcher.state:

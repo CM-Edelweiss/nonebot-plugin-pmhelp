@@ -9,6 +9,8 @@ class Config(BaseModel):
     pm_version: str = "11.45.14"
     # 自定义文本
     pm_text: str = "自定义文本"
+    # 被限流是否提醒
+    pm_message: bool = True
     # 帮助文件位置
     pm_plugin: str = "1"
     pm_path: str = ""

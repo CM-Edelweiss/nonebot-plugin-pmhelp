@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-pmhelp"
-version = "1.1.6"
+version = "1.1.7"
 description = "提取于LittlePaimon的帮助插件"
 authors = ["CM-Edelweiss <2633668472@qq.com>"]
 readme = "README.md"

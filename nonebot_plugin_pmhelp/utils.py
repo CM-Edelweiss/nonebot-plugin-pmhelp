@@ -1,8 +1,7 @@
 from io import BytesIO
 import httpx
-import datetime
-import functools
-import inspect
+import time
+from collections import defaultdict
 from ruamel.yaml import YAML
 from ssl import SSLCertVerificationError
 from pathlib import Path
@@ -13,8 +12,24 @@ from nonebot.params import CommandArg, Depends
 from nonebot import get_driver
 from nonebot.adapters.onebot.v11 import Message
 
-#图片缓存
+# 图片缓存
 cache_help = {}
+
+
+async def get_list(list: list, type: bool = True):
+    """
+    整合群/用户号
+
+    :param list: bot列表
+    :param type: 是否为群
+    :return: 带群/用户号的list
+
+    """
+    list_id = []
+    for i in list:
+        list_id.append(i["group_id" if type else "user_id"])
+    return list_id
+
 
 DRIVER = get_driver()
 try:
@@ -73,39 +88,6 @@ def CommandObjectID() -> int:
             return event.channel_id
 
     return Depends(_event_id)
-
-
-def cache(ttl=datetime.timedelta(hours=1)):
-    """
-    缓存装饰器
-        :param ttl: 过期时间
-    """
-
-    def wrap(func):
-        cache_data = {}
-
-        @functools.wraps(func)
-        async def wrapped(*args, **kw):
-            nonlocal cache_data
-            bound = inspect.signature(func).bind(*args, **kw)
-            bound.apply_defaults()
-            ins_key = '|'.join(
-                [f'{k}_{v}' for k, v in bound.arguments.items()])
-            default_data = {"time": None, "value": None}
-            data = cache_data.get(ins_key, default_data)
-            now = datetime.datetime.now()
-            if not data['time'] or now - data['time'] > ttl:
-                try:
-                    data['value'] = await func(*args, **kw)
-                    data['time'] = now
-                    cache_data[ins_key] = data
-                except Exception as e:
-                    raise e
-            return data['value']
-
-        return wrapped
-
-    return wrap
 
 
 def fullmatch(msg: Message = CommandArg()) -> bool:
@@ -184,3 +166,43 @@ async def get_img(url: str,
         save_path.parent.mkdir(parents=True, exist_ok=True)
         img.save(save_path)
     return img
+
+
+class FreqLimiter:
+    """
+    冷却器
+    """
+
+    def __init__(self):
+        """
+        初始化一个冷却器
+        """
+        self.next_time = defaultdict(float)
+
+    def check(self, key: str) -> bool:
+        """
+        检查是否冷却结束
+            :param key: key
+            :return: 布尔值
+        """
+        return time.time() >= self.next_time[key]
+
+    def start(self, key: str, cooldown_time: int = 0):
+        """
+        开始冷却
+            :param key: key
+            :param cooldown_time: 冷却时间(秒)
+        """
+        self.next_time[key] = time.time(
+        ) + (cooldown_time if cooldown_time > 0 else 60)
+
+    def left(self, key: str) -> int:
+        """
+        剩余冷却时间
+            :param key: key
+            :return: 剩余冷却时间
+        """
+        return int(self.next_time[key] - time.time()) + 1
+
+
+freqLimiter = FreqLimiter()

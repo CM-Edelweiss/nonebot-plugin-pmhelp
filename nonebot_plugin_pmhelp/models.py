@@ -3,7 +3,7 @@ from tortoise import fields
 from typing import List
 import datetime
 from nonebot import require
-#先导入(注意格式化移动)
+# 先导入(注意格式化移动)
 require("nonebot_plugin_tortoise_orm")
 from nonebot_plugin_tortoise_orm import add_model
 
@@ -50,6 +50,23 @@ class PluginDisable(Model):
 
     class Meta:
         table = "plugin_disable"
+
+
+class PluginTime(Model):
+    id = fields.IntField(pk=True, generated=True, auto_increment=True)
+    name: str = fields.TextField()
+    """插件名称"""
+    user_id: int = fields.IntField(null=True)
+    """用户id"""
+    group_id: int = fields.IntField(null=True)
+    """群组id"""
+    type: str = fields.CharField(max_length=10, default="time")
+    """限制类型 time/frequency"""
+    time: int = fields.IntField(null=True)
+    """限制时间/次数"""
+
+    class Meta:
+        table = "plugin_time"
 
 
 class PluginStatistics(Model):
