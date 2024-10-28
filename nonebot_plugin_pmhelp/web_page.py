@@ -1,13 +1,13 @@
 from amis import DisplayModeEnum, InputText, Textarea, Switch, \
     InputNumber, Alert, Card, Tpl, CardsCRUD, Static, Page, Html, Remark, InputPassword, AmisAPI, \
-    Wrapper, Horizontal, Form, Transfer, ActionType, Dialog, InputSubForm
+    Wrapper, Horizontal, Form, Transfer, ActionType, Dialog, InputSubForm, LevelEnum, Flex, Divider
 
 
 logo = Html(
     html=f"""
 <p align="center">
     <a href="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/">
-        <img src="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/raw/refs/heads/main/docs_image/nb_logo.png"
+        <img src="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png"
          width="256" height="256" alt="PMHELP">
     </a>
 </p>
@@ -131,6 +131,7 @@ detail_button = ActionType.Dialog(label='信息',
                                   icon='fa fa-pencil',
                                   dialog=Dialog(title='${name}信息设置', size='lg', body=[tips_alert, detail_form]))
 
+
 card = Card(
     header=Card.Header(title='$name',
                        subTitle='$module_name',
@@ -185,5 +186,14 @@ cards_curd = CardsCRUD(mode='cards',
                        footerToolbar=['switch-per-page', 'pagination'],
                        columnsCount=3,
                        card=card)
-
-admin_app = Page(title="PMHELP", body=cards_curd)
+operation_button = Flex(
+    justify='center',
+    items=[
+        ActionType.Ajax(
+            label='刷新用户列表',
+            api='/pmhelp/api/get_groups_flushed',
+            confirmText='该操作将会重新刷新群和好友列表',
+            level=LevelEnum.info,
+        )])
+admin_app = Page(title="PMHELP", body=[
+                 operation_button, Divider(), cards_curd])

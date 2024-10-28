@@ -23,7 +23,7 @@ HIDDEN_PLUGINS = [
     'nonebot_plugin_htmlrender',
     'nonebot_plugin_imageutils',
     'nonebot_plugin_localstore',
-    'nonebot_plugin_tortoise_orm'
+    'nonebot_plugin_tortoise_orm',
     'single_session'
 ]
 

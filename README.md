@@ -1,5 +1,5 @@
 <div align="center">
-  <a href="https://v2.nonebot.dev/store"><img src="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/raw/refs/heads/main/docs_image/nb_logo.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
+  <a href="https://v2.nonebot.dev/store"><img src="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
 
 </div>
 
@@ -16,7 +16,8 @@
 
 提供帮助图自动生成和插件权限管理<br>
 功能：全自动生成帮助图和插件禁用,限流控制<br>
-虽然LittlePaimon不再维护了，但是 [@CMHopeSunshine](https://github.com/CMHopeSunshine) 的帮助插件真好用，所以把LittlePaimon帮助插件独立出来（~~因为直接照搬，有问题请pr~~）
+虽然LittlePaimon不再维护了，但是 [@CMHopeSunshine](https://github.com/CMHopeSunshine) 的帮助插件真好用，所以把LittlePaimon帮助插件独立出来<br>
+（~~因为直接照搬，有问题请pr~~）
 
 ## 💿 安装
 
@@ -62,10 +63,11 @@
 ## 📋 效果
 
 帮助图(举例) <br>
-![_](https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/blob/main/docs_image/1.jpg)<br>
-被禁用对应变黑(全部禁用)<br>
-![_](https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/blob/main/docs_image/2.jpg)<br>
-
+![_](https://img.picui.cn/free/2024/10/28/671f9c5ad8c30.jpg)<br>
+被禁用对应变黑<br>
+![_](https://img.picui.cn/free/2024/10/28/671f9c5af1fc1.jpg)<br>
+webui(举例)<br>
+![_](https://img.picui.cn/free/2024/10/28/671f9c5ae1e92.png)<br>
 
 
 ## ⚙️ 配置
@@ -88,7 +90,10 @@
 
 
 nonebot2插件生成帮助图位于{帮助文件目录}/pm_config下<br>
-或者使用webui进行修改
+或者使用webui进行修改<br>
+```
+webui默认地址ip:端口/pmhelp/login
+```
 
 ```python
 举例(xxx.yml):

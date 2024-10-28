@@ -1,5 +1,6 @@
 import datetime
 import asyncio
+import json
 from typing import Optional
 
 from fastapi import FastAPI
@@ -14,6 +15,7 @@ from pydantic import BaseModel
 from .plugin.manage import PluginManager, PluginInfo
 from .models import PluginDisable
 from .utils import DRIVER
+from .Path import USERID_ALL
 from .pm_config import Pm_config
 from .web_page import login_page, admin_app
 from .logger import logger
@@ -67,7 +69,7 @@ async def init_web():
         app: FastAPI = get_app()
         logger.info(
             "PM Web UI",
-            f"<g>启用成功</g>，默认地址为<m>http://127.0.0.1:{DRIVER.config.port}/pmhelp/login</m>",
+            f"<g>启用成功</g>，默认地址为<m>http://{DRIVER.config.host}:{DRIVER.config.port}/pmhelp/login</m>",
         )
     except Exception as e:
         return logger.info('PM Web UI', f'启用<r>失败：{e}</r>')
@@ -96,6 +98,24 @@ async def init_web():
         dependencies=[authentication()],
     )
     async def get_groups_and_members():
+        bots = get_adapter(Adapter).bots
+        if len(bots) == 0:
+            return {"status": -100, "msg": "获取群和好友列表失败，请确认已连接QQ"}
+        bot = list(bots.values())[0]
+        PATH = USERID_ALL / f"{bot.self_id}.json"
+        if PATH.exists() and PATH.is_file():
+            with open(PATH, 'r', encoding='utf-8') as load_f:
+                data = json.load(load_f)
+            return data
+        else:
+            return {"status": -100, "msg": "请使用按钮刷新群和好友列表"}
+
+    @app.post(
+        '/pmhelp/api/get_groups_flushed',
+        response_class=JSONResponse,
+        dependencies=[authentication()],
+    )
+    async def get_groups_flushed():
         result = []
         bots = get_adapter(Adapter).bots
         if len(bots) == 0:
@@ -121,7 +141,8 @@ async def init_web():
                     ],
                 }
             )
-            await asyncio.sleep(0.2)
+            await asyncio.sleep(0.3)
+
         result = [
             {'label': '群组', 'selectMode': 'tree',
                 'searchable': True, 'children': result},
@@ -140,7 +161,12 @@ async def init_web():
                 ],
             },
         ]
-        return result
+        try:
+            with open(USERID_ALL / f"{bot.self_id}.json", 'w', encoding='utf-8') as f:
+                json.dump(result, f, ensure_ascii=False)
+        except Exception as e:
+            return {"status": -100, "msg": e}
+        return {"status": 0, "msg": "刷新成功"}
 
     @app.get('/pmhelp/api/get_plugins', response_class=JSONResponse, dependencies=[authentication()])
     async def get_plugins():
@@ -240,6 +266,7 @@ async def init_web():
     async def admin_page_app():
         return admin_app.render(
             site_title="PMHELP 后台管理",
+            site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
             theme="ang",
             requestAdaptor=requestAdaptor,
             responseAdaptor=responseAdaptor,

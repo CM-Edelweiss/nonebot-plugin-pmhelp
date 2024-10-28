@@ -33,3 +33,6 @@ else:
     PM_CONFIG = store.get_plugin_cache_file('pmhelp_data')
 PLUGIN_CONFIG = PM_CONFIG / 'pm_config'
 PLUGIN_CONFIG.mkdir(parents=True, exist_ok=True)
+# 群和用户文件
+USERID_ALL = PM_CONFIG / 'pm_userid_all'
+USERID_ALL.mkdir(parents=True, exist_ok=True)
