@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 
 from .plugin.manage import PluginManager, PluginInfo
-from .models import PluginDisable
+from .models import PluginDisable, PluginTime
 from .utils import DRIVER
 from .Path import USERID_ALL
 from .pm_config import Pm_config
@@ -63,6 +63,7 @@ class UserModel(BaseModel):
 
 @DRIVER.on_startup
 async def init_web():
+    """主程序"""
     if not Pm_config.pm_enable_web:
         return
     try:
@@ -76,6 +77,7 @@ async def init_web():
 
     @app.post("/pmhelp/api/login", response_class=JSONResponse)
     async def login(user: UserModel):
+        """登录api"""
         if (
             user.username != Pm_config.pm_username
             or user.password != Pm_config.pm_password
@@ -98,6 +100,7 @@ async def init_web():
         dependencies=[authentication()],
     )
     async def get_groups_and_members():
+        """获取群和好友列表api"""
         bots = get_adapter(Adapter).bots
         if len(bots) == 0:
             return {"status": -100, "msg": "获取群和好友列表失败，请确认已连接QQ"}
@@ -116,6 +119,7 @@ async def init_web():
         dependencies=[authentication()],
     )
     async def get_groups_flushed():
+        """更新群和好友列表api"""
         result = []
         bots = get_adapter(Adapter).bots
         if len(bots) == 0:
@@ -170,6 +174,7 @@ async def init_web():
 
     @app.get('/pmhelp/api/get_plugins', response_class=JSONResponse, dependencies=[authentication()])
     async def get_plugins():
+        """获取插件列表api"""
         plugins = await PluginManager.get_plugin_list_for_admin()
         return {
             'status': 0,
@@ -182,6 +187,7 @@ async def init_web():
 
     @app.post('/pmhelp/api/set_plugin_status', response_class=JSONResponse, dependencies=[authentication()])
     async def set_plugin_status(data: dict):
+        """保存插件禁用状态api（全局）"""
         module_name: str = data.get('plugin')
         status: bool = data.get('status')
         try:
@@ -197,6 +203,7 @@ async def init_web():
 
     @app.get('/pmhelp/api/get_plugin_bans', response_class=JSONResponse, dependencies=[authentication()])
     async def get_plugin_bans(module_name: str):
+        """获取插件禁用状态api"""
         result = []
         bans = await PluginDisable.filter(name=module_name).all()
         for ban in bans:
@@ -217,6 +224,7 @@ async def init_web():
 
     @app.post('/pmhelp/api/set_plugin_bans', response_class=JSONResponse, dependencies=[authentication()])
     async def set_plugin_bans(data: dict):
+        """保存插件禁用状态api（自定义）"""
         bans = data['bans']
         name = data['module_name']
         await PluginDisable.filter(name=name, global_disable=False).delete()
@@ -240,8 +248,59 @@ async def init_web():
             'msg':    '插件权限设置成功'
         }
 
+    @app.get('/pmhelp/api/get_message_bans', response_class=JSONResponse, dependencies=[authentication()])
+    async def get_message_bans(module_name: str):
+        """获取插件限流状态api"""
+        result = []
+        bans = await PluginTime.filter(name=module_name).all()
+        for ban in bans:
+            if ban.user_id and ban.group_id:
+                result.append(f'群{ban.group_id}.{ban.user_id}')
+            elif ban.group_id and not ban.user_id:
+                result.append(f'群{ban.group_id}')
+            elif ban.user_id and not ban.group_id:
+                result.append(f'{ban.user_id}')
+        return {
+            'status': 0,
+            'msg':    'ok',
+            'data':   {
+                'module_name': module_name,
+                'bans': result
+            }
+        }
+
+    @app.post('/pmhelp/api/set_message_bans', response_class=JSONResponse, dependencies=[authentication()])
+    async def set_message_bans(data: dict):
+        """保存插件限流状态api"""
+        bans = data['bans']
+        name = data['module_name']
+        type = data['type']
+        time = data["time"]
+        await PluginTime.filter(name=name).delete()
+
+        for ban in bans:
+            if ban.startswith('群'):
+                if '.' in ban:
+                    group_id = int(ban.split('.')[0][1:])
+                    user_id = int(ban.split('.')[1])
+                    await PluginTime.update_or_create(name=name, group_id=group_id, user_id=user_id, type=type, time=time)
+                else:
+                    await PluginTime.update_or_create(name=name, group_id=int(ban[1:]), type=type, time=time)
+            else:
+                await PluginTime.update_or_create(name=name, user_id=int(ban), type=type, time=time)
+        try:
+            from .utils import cache_help
+            cache_help.clear()
+        except Exception:
+            pass
+        return {
+            'status': 0,
+            'msg':    '插件设置成功'
+        }
+
     @app.post('/pmhelp/api/set_plugin_detail', response_class=JSONResponse, dependencies=[authentication()])
     async def set_plugin_detail(plugin_info: PluginInfo):
+        """yml文件保存"""
         PluginManager.plugins[plugin_info.module_name] = plugin_info
         PluginManager.save()
         try:

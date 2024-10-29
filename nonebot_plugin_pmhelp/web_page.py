@@ -1,6 +1,6 @@
 from amis import DisplayModeEnum, InputText, Textarea, Switch, \
     InputNumber, Alert, Card, Tpl, CardsCRUD, Static, Page, Html, Remark, InputPassword, AmisAPI, \
-    Wrapper, Horizontal, Form, Transfer, ActionType, Dialog, InputSubForm, LevelEnum, Flex, Divider
+    Wrapper, Horizontal, Form, Transfer, ActionType, Dialog, InputSubForm, LevelEnum, Flex, Divider, Radios
 
 
 logo = Html(
@@ -78,6 +78,55 @@ permission_button = ActionType.Dialog(label='使用权限',
                                       icon='fa fa-pencil',
                                       dialog=Dialog(title='${name}使用权限设置', size='lg', body=ban_form))
 
+
+xl_form = Form(title='',
+               api='post:/pmhelp/api/set_message_bans',
+               initApi='get:/pmhelp/api/get_message_bans?module_name=${module_name}',
+               body=[
+                   Transfer(
+                       type='tabs-transfer',
+                       name='bans',
+                       value='${bans}',
+                       label='',
+                       resultTitle='限流管理列表',
+                       selectMode='tree',
+                       joinValues=False,
+                       extractValue=True,
+                       statistics=True,
+                       multiple=True,
+                       menuTpl='${left_label}',
+                       valueTpl='${right_label}',
+                       source='get:/pmhelp/api/get_groups_and_members',
+                   ),
+                   Radios(
+                       label='限流类型',
+                       name='type',
+                       options=[
+                            {
+                                "label": "倒计时类",
+                                "value": "time"
+                            },
+                           {
+                                "label": "每分钟类(未完成)",
+                                "value": "frequency"
+                            }
+                       ],
+                       selectFirst=True,
+                   ),
+                   InputNumber(label='限流时间/次数(10为默认值)',
+                               name='time',
+                               value=10,
+                               min=1,
+                               clearValueOnEmpty=True,
+                               required=True,
+                               )
+               ])
+
+xl_button = ActionType.Dialog(label='限流管理',
+                              icon='fa fa-pencil',
+                              dialog=Dialog(title='${name}限流管理设置', size='lg', body=xl_form))
+
+
 command_form = InputSubForm(name='matchers',
                             label='命令列表',
                             multiple=True,
@@ -126,6 +175,7 @@ detail_form = Form(title='',
                    ])
 tips_alert = Alert(level='info',
                    body='以下设置用于在本管理页面以及help帮助图中显示插件的信息，不会影响插件的实际使用，你可以修改这些信息来自定义帮助图效果。')
+
 detail_button = ActionType.Dialog(label='信息',
                                   size='lg',
                                   icon='fa fa-pencil',
@@ -138,7 +188,7 @@ card = Card(
                        description='$description',
                        avatarText='$name',
                        avatarTextClassName='overflow-hidden'),
-    actions=[detail_button, permission_button],
+    actions=[detail_button, permission_button, xl_button],
     toolbar=[
         Tpl(tpl='未加载', className='label label-warning', hiddenOn='${isLoad}'),
         Switch(name='enable',

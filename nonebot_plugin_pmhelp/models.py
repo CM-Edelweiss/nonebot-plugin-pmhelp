@@ -17,8 +17,6 @@ add_model(
 
 
 class PluginPermission(Model):
-    """将在N个版本后废弃"""
-
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
     name: str = fields.TextField()
     """插件名称"""
@@ -31,7 +29,7 @@ class PluginPermission(Model):
     ban: List[int] = fields.JSONField(default=[])
     """插件屏蔽列表"""
     statistics: dict = fields.JSONField(default=dict)
-    """插件调用统计，废弃选项，不再使用"""
+    """插件调用统计(x)"""
 
     class Meta:
         table = "plugin_permission"

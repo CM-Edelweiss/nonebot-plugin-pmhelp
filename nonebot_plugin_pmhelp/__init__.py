@@ -86,7 +86,7 @@ async def _(
     state["session_id"] = session_id
     state["bool"] = match["func"] == "unban"
     state["plugin_no_exist"] = []
-    state["type"] = match["type"]
+    state["type"] = ("time" if match["type"] == "t" else "frequency")
     state["time"] = match["time"] if match["time"] else 10
     if any(w in match["plugin"] for w in {"all", "全部"}):
         state["is_all"] = True
@@ -141,7 +141,7 @@ async def _(
     state["session_id"] = session_id
     state["bool"] = match["func"] == "unban"
     state["plugin_no_exist"] = []
-    state["type"] = match["type"]
+    state["type"] = ("time" if match["type"] == "t" else "frequency")
     state["time"] = match["time"] if match["time"] else 10
     if any(w in match["plugin"] for w in {"all", "全部"}):
         state["is_all"] = True
