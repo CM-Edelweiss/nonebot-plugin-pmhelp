@@ -14,13 +14,14 @@ from .utils import (
     DRIVER,
     CommandObjectID,
     fullmatch_rule,
+    cache_help,
+    get_list,
 )
 from .plugin.manage import PluginManager
 from .models import PluginDisable, PluginTime
 from .logger import logger
 from .draw_help import draw_help
 from .pm_config import Config
-from .utils import cache_help, get_list
 
 # 加载web
 from . import web_api, web_page
@@ -35,8 +36,8 @@ __plugin_meta__ = PluginMetadata(
     supported_adapters={"~onebot.v11"},
     extra={
         'author': 'CM-Edelweiss',
-        'version': '1.1',
-        'priority': 3,
+        'version': '1.2',
+        'priority': 1,
     },
 )
 
@@ -145,7 +146,7 @@ async def _(
     if any(w in match["plugin"] for w in {"all", "全部"}):
         state["is_all"] = True
         state["plugin"] = [
-            p for p in PluginManager.plugins.keys() if p != "plugin_manager"
+            p for p in PluginManager.plugins.keys() if p != "nonebot_plugin_pmhelp"
         ]
     else:
         state["is_all"] = False
