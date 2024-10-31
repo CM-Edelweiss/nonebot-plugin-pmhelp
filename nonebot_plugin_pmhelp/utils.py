@@ -13,7 +13,7 @@ from typing import Dict,  Any, Union, Optional, Tuple, List
 from PIL import Image
 from nonebot import require
 # 先导入(注意格式化移动)
-require("nonebot_plugin_localstore")
+require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler
 
 # 图片缓存
