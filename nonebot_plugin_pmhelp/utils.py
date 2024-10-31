@@ -1,3 +1,7 @@
+from nonebot.adapters.onebot.v11 import Message
+from nonebot import get_driver
+from nonebot.params import CommandArg, Depends
+from nonebot.rule import Rule
 from io import BytesIO
 import httpx
 import time
@@ -7,13 +11,20 @@ from ssl import SSLCertVerificationError
 from pathlib import Path
 from typing import Dict,  Any, Union, Optional, Tuple, List
 from PIL import Image
-from nonebot.rule import Rule
-from nonebot.params import CommandArg, Depends
-from nonebot import get_driver
-from nonebot.adapters.onebot.v11 import Message
+from nonebot import require
+# 先导入(注意格式化移动)
+require("nonebot_plugin_localstore")
+from nonebot_plugin_apscheduler import scheduler
 
 # 图片缓存
 cache_help = {}
+XL_list = {}
+
+DRIVER = get_driver()
+try:
+    SUPERUSERS: List[int] = [int(s) for s in DRIVER.config.superusers]
+except Exception:
+    SUPERUSERS = []
 
 
 async def get_list(list: list, type: bool = True):
@@ -31,11 +42,26 @@ async def get_list(list: list, type: bool = True):
     return list_id
 
 
-DRIVER = get_driver()
-try:
-    SUPERUSERS: List[int] = [int(s) for s in DRIVER.config.superusers]
-except Exception:
-    SUPERUSERS = []
+async def XlCount(key: str, frequency: int):
+    if key not in XL_list:
+        # 进入限制
+        XL_list[key] = {
+            "initial": frequency,
+            "frequency": frequency - 1,
+        }
+        return True
+    elif XL_list[key]["frequency"] > 0:
+        XL_list[key]["frequency"] = XL_list[key]["frequency"] - 1
+        return True
+    else:
+        return False
+
+
+@scheduler.scheduled_job('cron', minute='*', id='job_id')
+async def scheduled_job():
+    # 重置次数
+    for i in XL_list:
+        XL_list[i]["frequency"] = XL_list[i]["initial"]
 
 
 def load_yaml(path: Union[Path, str], encoding: str = 'utf-8'):

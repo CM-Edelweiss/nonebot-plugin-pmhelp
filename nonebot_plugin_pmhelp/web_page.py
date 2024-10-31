@@ -107,7 +107,7 @@ xl_form = Form(title='',
                                 "value": "time"
                             },
                            {
-                                "label": "每分钟类(未完成)",
+                                "label": "每分钟类",
                                 "value": "frequency"
                             }
                        ],
