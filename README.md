@@ -21,6 +21,8 @@
 
 ## 💿 安装
 
+`使用镜像站可能需要等待镜像站同步`
+
 <details open>
 <summary>使用 nb-cli 安装</summary>
 在 nonebot2 项目的根目录下打开命令行, 输入以下指令即可安装
