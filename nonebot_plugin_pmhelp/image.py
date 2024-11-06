@@ -1,16 +1,19 @@
+from typing import (
+    Tuple,
+    Union,
+    Literal,
+    Optional,
+    Dict,
+    Any,
+)
 from io import BytesIO
 from pathlib import Path
-from nonebot.utils import run_sync
-from nonebot.adapters.onebot.v11 import MessageSegment
-import matplotlib.pyplot as plt
-from PIL import Image, ImageDraw, ImageFont
-from PIL.ImageFont import FreeTypeFont
-from typing import Tuple, Union, Literal, Optional, Dict, Any
-
 from .Path import FONTS_PATH
 from .pm_config import Pm_config
-
-plt.switch_backend('agg')
+from nonebot.utils import run_sync
+from PIL.ImageFont import FreeTypeFont
+from PIL import Image, ImageDraw, ImageFont
+from nonebot.adapters.onebot.v11 import MessageSegment
 
 
 class PMImage:

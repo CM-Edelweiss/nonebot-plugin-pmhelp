@@ -1,6 +1,12 @@
-from amis import DisplayModeEnum, InputText, Textarea, Switch, \
-    InputNumber, Alert, Card, Tpl, CardsCRUD, Static, Page, Html, Remark, InputPassword, AmisAPI, \
-    Wrapper, Horizontal, Form, Transfer, ActionType, Dialog, InputSubForm, LevelEnum, Flex, Divider, Radios
+from amis import (
+    Flex, Divider, Radios,
+    InputNumber, Alert, Card, Tpl,
+    CardsCRUD, Static, Page, Html,
+    Remark, InputPassword, AmisAPI,
+    Wrapper, Horizontal, Form, Transfer,
+    DisplayModeEnum, InputText, Textarea, Switch,
+    ActionType, Dialog, InputSubForm, LevelEnum,
+)
 
 
 logo = Html(

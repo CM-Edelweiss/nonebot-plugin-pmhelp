@@ -1,29 +1,48 @@
-import contextlib
+import asyncio
 import datetime
-from typing import Dict, List
-
-from nonebot import plugin as nb_plugin
-from nonebot.adapters.onebot.v11 import MessageEvent, PrivateMessageEvent, GroupMessageEvent, Bot
-from nonebot.exception import IgnoredException
-from nonebot.matcher import Matcher
-from nonebot.message import run_preprocessor
-from tortoise.queryset import Q
-
-from ..models import PluginPermission, PluginStatistics, PluginDisable, PluginTime
+import contextlib
+from ..models import (
+    PluginPermission,
+    PluginStatistics,
+    PluginDisable,
+    PluginTime,
+    PluginWithdraw,
+)
+from ..utils import (
+    SUPERUSERS,
+    load_yaml,
+    save_yaml,
+    freqLimiter,
+    XlCount,
+    withdraw_message,
+)
 from ..logger import logger
-from ..utils import SUPERUSERS, load_yaml, save_yaml, freqLimiter, XlCount
+from tortoise.queryset import Q
 from ..Path import PLUGIN_CONFIG
-from .model import MatcherInfo, PluginInfo
 from ..pm_config import Pm_config
+from nonebot.matcher import Matcher
+from nonebot import plugin as nb_plugin
+from nonebot.adapters.onebot.v11 import (
+    MessageEvent,
+    PrivateMessageEvent,
+    GroupMessageEvent,
+    Bot,
+)
+from .model import MatcherInfo, PluginInfo
+from nonebot.message import run_preprocessor
+from typing import Dict, List, Any, Optional
+from nonebot.exception import IgnoredException
+from nonebot.internal.matcher import current_event, current_matcher
+
 
 HIDDEN_PLUGINS = [
-    'config',
     'nonebot_plugin_apscheduler',
     'nonebot_plugin_gocqhttp',
     'nonebot_plugin_htmlrender',
     'nonebot_plugin_imageutils',
     'nonebot_plugin_localstore',
     'nonebot_plugin_tortoise_orm',
+    "nonebot_plugin_pmhelp",
     'single_session'
 ]
 
@@ -188,7 +207,7 @@ async def _(event: MessageEvent, bot: Bot, matcher: Matcher):
                         msg = f'{matcher.plugin_name}冷却ing...剩余{freqLimiter.left(f"{matcher.plugin_name}-{event.group_id}-{event.user_id}")}秒'
                         is_ignored = message_bool = True
                 else:
-                    if not await XlCount(f'{matcher.plugin_name}-{event.group_id}-{event.user_id}', id.time):
+                    if not await XlCount(f'{matcher.plugin_name}-{event.group_id}-{event.user_id}', user_ids[event.user_id]):
                         msg = f'{matcher.plugin_name}本分钟使用次数达到上限...'
                         is_ignored = message_bool = True
     except Exception as e:
@@ -214,3 +233,38 @@ async def _(event: MessageEvent, bot: Bot, matcher: Matcher):
                                               user_id=event.user_id,
                                               message_type=event.message_type,
                                               time=datetime.datetime.now())
+
+
+@Bot.on_called_api
+async def _(bot: Bot, exception: Optional[Exception], api: str, data: Any, result: Any):
+    if exception or str(api) != "send_msg":
+        return
+    try:
+        event = current_event.get()
+        matcher = current_matcher.get()
+    except LookupError:
+        return
+    if event.user_id in SUPERUSERS:
+        return
+    if not matcher.plugin_name or matcher.plugin_name in HIDDEN_PLUGINS:
+        return
+    if not isinstance(event, (PrivateMessageEvent, GroupMessageEvent)):
+        return
+    try:
+        tasks = []
+        if id := await PluginWithdraw.get_or_none(name=matcher.plugin_name, user_id=event.user_id, group_id=None):
+            tasks.append(asyncio.ensure_future(withdraw_message(
+                bot=bot, message_id=result["message_id"], time=id.time)))
+        elif isinstance(event, GroupMessageEvent) and (
+                perms := await PluginWithdraw.filter(name=matcher.plugin_name, group_id=event.group_id)):
+            user_ids = {}
+            for p in perms:
+                if (p.user_id == None) and (id := await PluginWithdraw.get_or_none(name=matcher.plugin_name, user_id=None, group_id=event.group_id)):
+                    user_ids[event.user_id] = id.time
+                else:
+                    user_ids[p.user_id] = p.time
+            if None in user_ids or event.user_id in user_ids:
+                tasks.append(asyncio.ensure_future(withdraw_message(
+                    bot=bot, message_id=result["message_id"], time=user_ids[event.user_id])))
+    except Exception as e:
+        logger.info('插件管理器[撤回]', f'插件权限检查<r>失败：{e}</r>')

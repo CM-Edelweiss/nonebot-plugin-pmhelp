@@ -1,5 +1,4 @@
 from typing import Optional, List
-
 try:
     from pydantic.v1 import BaseModel
 except:

@@ -1,17 +1,26 @@
-from nonebot.adapters.onebot.v11 import Message
-from nonebot import get_driver
-from nonebot.params import CommandArg, Depends
-from nonebot.rule import Rule
-from io import BytesIO
-import httpx
 import time
-from collections import defaultdict
-from ruamel.yaml import YAML
-from ssl import SSLCertVerificationError
-from pathlib import Path
-from typing import Dict,  Any, Union, Optional, Tuple, List
+import httpx
+import asyncio
+from typing import (
+    Dict,
+    Any,
+    Union,
+    Optional,
+    Tuple,
+    List,
+)
 from PIL import Image
+from io import BytesIO
+from pathlib import Path
+from .logger import logger
 from nonebot import require
+from ruamel.yaml import YAML
+from nonebot import get_driver
+from nonebot.rule import Rule
+from collections import defaultdict
+from ssl import SSLCertVerificationError
+from nonebot.params import CommandArg, Depends
+from nonebot.adapters.onebot.v11 import Message, Bot
 # 先导入(注意格式化移动)
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler
@@ -232,3 +241,12 @@ class FreqLimiter:
 
 
 freqLimiter = FreqLimiter()
+
+
+async def withdraw_message(bot: Bot, message_id: int, time: int = 10):
+    # 延迟撤回
+    await asyncio.sleep(time)
+    try:
+        await bot.delete_msg(message_id=message_id)
+    except Exception as e:
+        logger.info('插件管理器[撤回]', f'插件权限检查<r>失败：{e}</r>')

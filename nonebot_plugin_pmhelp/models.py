@@ -1,13 +1,12 @@
-from tortoise.models import Model
-from tortoise import fields
-from typing import List
 import datetime
+from typing import List
+from tortoise import fields
 from nonebot import require
+from tortoise.models import Model
+from .Path import MANAGER_DB_PATH
 # 先导入(注意格式化移动)
 require("nonebot_plugin_tortoise_orm")
 from nonebot_plugin_tortoise_orm import add_model
-
-from .Path import MANAGER_DB_PATH
 
 add_model(
     __name__,
@@ -48,6 +47,21 @@ class PluginDisable(Model):
 
     class Meta:
         table = "plugin_disable"
+
+
+class PluginWithdraw(Model):
+    id = fields.IntField(pk=True, generated=True, auto_increment=True)
+    name: str = fields.TextField()
+    """插件名称"""
+    user_id: int = fields.IntField(null=True)
+    """用户id"""
+    group_id: int = fields.IntField(null=True)
+    """群组id"""
+    time: int = fields.IntField()
+    """等待时间"""
+
+    class Meta:
+        table = "plugin_withdraw"
 
 
 class PluginTime(Model):

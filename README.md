@@ -1,16 +1,16 @@
 <div align="center">
   <a href="https://v2.nonebot.dev/store"><img src="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png" width="180" height="180" alt="NoneBotPluginLogo"></a>
 
-</div>
-
-<div align="center">
-
 # nonebot-plugin-pmhelp
 
+_✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_blank">LittlePaimon</a>的插件管理器✨_
+
+<a href="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp">
+    <img alt="Image Size" src="https://img.shields.io/pypi/dm/nonebot-plugin-pmhelp">
+    <img alt="Image Size" src="https://img.shields.io/pypi/v/nonebot-plugin-pmhelp">
+</a>
 
 </div>
-<h4 align="center">✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_blank">LittlePaimon</a>的插件管理器✨</h4>
-
 
 ## 📖 介绍
 
@@ -139,7 +139,7 @@ xxx = on_command(
 | pm ban/unban <插件名> | 管理 | 否 | 全部 | 群/用户权限管理 |
 
 ```python
-命令：pm ban|unban <插件名> -g <群号> -u <用户号> -x t|f <时间/次数>
+命令：pm ban|unban <插件名> -g <群号> -u <用户号> -x t|f <时间/次数> -w <时间>
 
 参数：
     ban|unban：禁用/启用使用或者禁用/启用限流
@@ -154,13 +154,23 @@ xxx = on_command(
     <时间/次数>默认值： 10s
     t:多少秒后可以再次使用
     f:一分钟使用次数
+-w 延迟撤回
+    <时间> 发送后多少s后撤回
+
 额外说明：
     如果要全局禁用/启用某一个用户，需要超级用户私聊Bot来使用命令
 
 举例: 
-    pm ban all (仅群聊，禁用当前群所有插件)
-    pm ban all -g -all (禁用所有群的所有插件)
-    
+    -pm ban all 
+    仅群聊，禁用当前群所有插件
+    -pm ban all -g all 
+    禁用所有群的所有插件
+    -pm ban all -x t 10 
+    当前群所有插件使用后10s才可以再次使用
+    -pm unban all -x t 10 
+    解除当前群所有插件的限流
+    -pm ban all -w 10
+    当前群所有插件使用后10s后撤回
 ```
 
 ## 丨💸鸣谢

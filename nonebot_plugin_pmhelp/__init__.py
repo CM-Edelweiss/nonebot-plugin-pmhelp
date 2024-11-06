@@ -1,14 +1,3 @@
-from nonebot import on_regex, on_command
-from nonebot.adapters.onebot.v11 import (
-    GroupMessageEvent,
-    PrivateMessageEvent,
-    MessageEvent,
-    Bot,
-)
-from nonebot.params import RegexDict
-from nonebot.typing import T_State
-from nonebot.plugin import PluginMetadata
-
 from .utils import (
     SUPERUSERS,
     DRIVER,
@@ -17,14 +6,24 @@ from .utils import (
     cache_help,
     get_list,
 )
-from .plugin.manage import PluginManager
-from .models import PluginDisable, PluginTime
 from .logger import logger
-from .draw_help import draw_help
 from .pm_config import Config
-
 # 加载web
 from . import web_api, web_page
+from .draw_help import draw_help
+from nonebot.typing import T_State
+from nonebot.params import RegexDict
+from .plugin.manage import PluginManager
+from nonebot import on_regex, on_command
+from nonebot.plugin import PluginMetadata
+from nonebot.adapters.onebot.v11 import (
+    GroupMessageEvent,
+    PrivateMessageEvent,
+    MessageEvent,
+    Bot,
+)
+from .models import PluginDisable, PluginTime, PluginWithdraw
+
 
 __plugin_meta__ = PluginMetadata(
     name='PM帮助',
@@ -48,12 +47,12 @@ async def startup():
 
 
 manage_cmd = on_regex(
-    r"^pm (?P<func>ban|unban) (?P<plugin>([\w ]*)|all|全部) ?(-g (?P<group>([\w ]*)|all|全部) ?)?(-u (?P<user>([\w ]*)|all|全部) ?)?(-x (?P<type>(t|f))(?P<time>([\d ]*)) ?)?",
+    r"^pm (?P<func>ban|unban) (?P<plugin>([\w ]*)|all|全部) ?(-g (?P<group>([\w ]*)|all|全部) ?)?(-u (?P<user>([\w ]*)|all|全部) ?)?(-x (?P<type>(t|f))(?P<time>([\d ]*)) ?)?(-w (?P<withdraw>([\d ]*)) ?)?",
     priority=2,
     block=True,
     state={
         "pm_name": "pm-ban|unban",
-        "pm_description": "禁用|取消禁用插件的群|用户使用权限或者进行限流",
+        "pm_description": "禁用|取消禁用插件的群|用户使用权限/进行限流/延迟撤回",
         "pm_usage": "pm ban|unban <插件名>",
         "pm_priority": 2,
     },
@@ -87,6 +86,7 @@ async def _(
     state["bool"] = match["func"] == "unban"
     state["plugin_no_exist"] = []
     state["type"] = match["type"]
+    state["withdraw"] = match["withdraw"]
     state["time"] = match["time"] if match["time"] else 10
     if any(w in match["plugin"] for w in {"all", "全部"}):
         state["is_all"] = True
@@ -142,6 +142,7 @@ async def _(
     state["bool"] = match["func"] == "unban"
     state["plugin_no_exist"] = []
     state["type"] = match["type"]
+    state["withdraw"] = match["withdraw"]
     state["time"] = match["time"] if match["time"] else 10
     if any(w in match["plugin"] for w in {"all", "全部"}):
         state["is_all"] = True
@@ -196,26 +197,61 @@ async def _(state: T_State):
     extra_msg = f'，但没有叫{" ".join(state["plugin_no_exist"])}的插件。' if state['plugin_no_exist'] else '。'
     cache_help.clear()
     filter_arg = {}
-    if state['type']:
-        state["type"] = ("time" if state['type'] == "t" else "frequency")
+    if state["withdraw"]:
         if state['group']:
             filter_arg['group_id__in'] = state['group']
             if state['user']:
                 filter_arg['user_id__in'] = state['user']
                 logger.info('插件管理器',
-                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>中用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型{state["type"]}-时间{state["time"]}</m>')
-                msg = f'已{"开启" if not state["bool"] else "关闭"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}中用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制，\n类型{state["type"]}-时间{state["time"]} {extra_msg}'
+                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>中用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}')
+                msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}中用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]} {extra_msg}'
             else:
                 filter_arg['user_id'] = None
                 logger.info('插件管理器',
-                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型{state["type"]}-时间{state["time"]}</m>')
-                msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制，\n类型{state["type"]}-时间{state["time"]} {extra_msg}'
+                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}')
+                msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}{extra_msg}'
         else:
             filter_arg['user_id__in'] = state['user']
             filter_arg['group_id'] = None
             logger.info('插件管理器',
-                        f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型{state["type"]}-时间{state["time"]}</m>')
-            msg = f'已{"启用" if not state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制，\n类型{state["type"]}-时间{state["time"]} {extra_msg}'
+                        f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}')
+            msg = f'已{"启用" if not state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}{extra_msg}'
+        await PluginWithdraw.filter(name__in=state['plugin'], **filter_arg).delete()
+        if state['bool']:
+            pass
+        else:
+            for plugin in state['plugin']:
+                if state['group']:
+                    for group in state['group']:
+                        if state['user']:
+                            for user in state['user']:
+                                await PluginWithdraw.update_or_create(name=plugin, group_id=group, user_id=user, time=state["withdraw"])
+                        else:
+                            await PluginWithdraw.update_or_create(name=plugin, group_id=group, user_id=None, time=state["withdraw"])
+                else:
+                    for user in state['user']:
+                        await PluginWithdraw.update_or_create(name=plugin, user_id=user, group_id=None, time=state["withdraw"])
+
+    elif state['type']:
+        state["type"] = ("frequency" if state['type'] == "f" else "time")
+        if state['group']:
+            filter_arg['group_id__in'] = state['group']
+            if state['user']:
+                filter_arg['user_id__in'] = state['user']
+                logger.info('插件管理器',
+                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>中用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}</m>')
+                msg = f'已{"开启" if not state["bool"] else "关闭"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}中用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制\n类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]} {extra_msg}'
+            else:
+                filter_arg['user_id'] = None
+                logger.info('插件管理器',
+                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}</m>')
+                msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制\n类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}'
+        else:
+            filter_arg['user_id__in'] = state['user']
+            filter_arg['group_id'] = None
+            logger.info('插件管理器',
+                        f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}</m>')
+            msg = f'已{"启用" if not state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制\n类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]} {extra_msg}'
         await PluginTime.filter(name__in=state['plugin'], **filter_arg).delete()
         if state['bool']:
             pass

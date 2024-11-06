@@ -1,7 +1,6 @@
 from typing import Dict
-
-from nonebot import logger as nb_logger
 from nonebot.utils import escape_tag
+from nonebot import logger as nb_logger
 
 
 class logger:
