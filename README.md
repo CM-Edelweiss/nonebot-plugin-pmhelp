@@ -16,7 +16,7 @@
 
 提供帮助图自动生成和插件权限管理<br>
 功能：全自动生成帮助图和插件禁用,限流控制<br>
-虽然LittlePaimon不再维护了，但是 [@CMHopeSunshine](https://github.com/CMHopeSunshine) 的帮助插件真好用，所以把LittlePaimon帮助插件独立出来<br>
+虽然LittlePaimon基本处于半死亡状态了，但是 [@CMHopeSunshine](https://github.com/CMHopeSunshine) 的插件管理器真好用，所以把LittlePaimon帮助插件独立出来用于非原神bot的使用<br>
 （~~因为直接照搬，有问题请pr~~）
 
 ## 💿 安装
@@ -136,10 +136,11 @@ xxx = on_command(
 | 指令 | 权限 | 需要@ | 范围 | 说明 |
 |:-----:|:----:|:----:|:----:|:----:|
 | help | 所有 | 否 | 全部 | 打开所有帮助 |
-| pm ban/unban <插件名> | 管理 | 否 | 全部 | 禁用/取消禁用插件的群/用户使用权限或者限流 |
+| pm ban/unban <插件名> | 管理 | 否 | 全部 | 群/用户权限管理 |
 
 ```python
 命令：pm ban|unban <插件名> -g <群号> -u <用户号> -x t|f <时间/次数>
+
 参数：
     ban|unban：禁用/启用使用或者禁用/启用限流
 <插件名>：可以是中/英文或者all，all表示所有插件，多个插件用空格分隔
@@ -155,6 +156,11 @@ xxx = on_command(
     f:一分钟使用次数
 额外说明：
     如果要全局禁用/启用某一个用户，需要超级用户私聊Bot来使用命令
+
+举例: 
+    pm ban all (仅群聊，禁用当前群所有插件)
+    pm ban all -g -all (禁用所有群的所有插件)
+    
 ```
 
 ## 丨💸鸣谢

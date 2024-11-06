@@ -1,6 +1,9 @@
 import datetime
 import asyncio
-import json
+try:
+    import ujson as json
+except:
+    import json
 from typing import Optional
 
 from fastapi import FastAPI

@@ -28,7 +28,7 @@ from . import web_api, web_page
 
 __plugin_meta__ = PluginMetadata(
     name='PM帮助',
-    description='根据加载的nonebot2插件管理器，可以自动生成帮助图，源自LittlePaimon',
+    description='源于LittlePaimon的插件管理器插件，提供自动生成帮助图，并对群/私聊进行权限管理',
     usage='help',
     type="application",
     homepage="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp",
@@ -86,7 +86,7 @@ async def _(
     state["session_id"] = session_id
     state["bool"] = match["func"] == "unban"
     state["plugin_no_exist"] = []
-    state["type"] = ("time" if match["type"] == "t" else "frequency")
+    state["type"] = match["type"]
     state["time"] = match["time"] if match["time"] else 10
     if any(w in match["plugin"] for w in {"all", "全部"}):
         state["is_all"] = True
@@ -141,7 +141,7 @@ async def _(
     state["session_id"] = session_id
     state["bool"] = match["func"] == "unban"
     state["plugin_no_exist"] = []
-    state["type"] = ("time" if match["type"] == "t" else "frequency")
+    state["type"] = match["type"]
     state["time"] = match["time"] if match["time"] else 10
     if any(w in match["plugin"] for w in {"all", "全部"}):
         state["is_all"] = True
@@ -197,6 +197,7 @@ async def _(state: T_State):
     cache_help.clear()
     filter_arg = {}
     if state['type']:
+        state["type"] = ("time" if state['type'] == "t" else "frequency")
         if state['group']:
             filter_arg['group_id__in'] = state['group']
             if state['user']:
