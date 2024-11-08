@@ -6,6 +6,8 @@ from nonebot import get_plugin_config
 class Config(BaseModel):
     # 图片资源缓存开关
     img_cache: bool = True
+    # 名称
+    pm_name: str = "NoneBot帮助"
     # 版本
     pm_version: str = "11.45.14"
     # 自定义文本

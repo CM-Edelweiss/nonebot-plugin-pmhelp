@@ -34,7 +34,7 @@ from typing import Dict, List, Any, Optional
 from nonebot.exception import IgnoredException
 from nonebot.internal.matcher import current_event, current_matcher
 
-
+#屏蔽插件名称
 HIDDEN_PLUGINS = [
     'nonebot_plugin_apscheduler',
     'nonebot_plugin_gocqhttp',
@@ -42,8 +42,11 @@ HIDDEN_PLUGINS = [
     'nonebot_plugin_imageutils',
     'nonebot_plugin_localstore',
     'nonebot_plugin_tortoise_orm',
-    "nonebot_plugin_pmhelp",
-    'single_session'
+    'nonebot_plugin_pmhelp',
+    'nonebot_plugin_alconna',
+    'nonebot_plugin_uninfo',
+    'single_session',
+    'uniseg',
 ]
 
 

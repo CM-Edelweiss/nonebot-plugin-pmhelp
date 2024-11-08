@@ -21,11 +21,11 @@ MANAGER_DB_PATH = DATABASE_PATH / 'manager.db'
 
 
 # 插件管理器文件存放目录
-if Pm_config.pm_plugin == "1":
+if str(Pm_config.pm_plugin) == "1":
     PM_CONFIG = store.get_plugin_cache_file('pmhelp_data')
 elif Pm_config.pm_plugin == "2":
     PM_CONFIG = Path()
-elif Pm_config.pm_plugin == "3" and Pm_config.pm_path:
+elif str(Pm_config.pm_plugin) == "3" and Pm_config.pm_path:
     PM_CONFIG = Path(Pm_config.pm_path)
 else:
     logger.info('插件管理器', f'<r>插件目录配置失败，请检查。</r>')
