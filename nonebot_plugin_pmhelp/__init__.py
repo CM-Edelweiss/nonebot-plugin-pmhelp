@@ -234,24 +234,25 @@ async def _(state: T_State):
     # 限流
     elif state['type']:
         state["type"] = ("frequency" if state['type'] == "f" else "time")
+        t= '.' if state['bool'] else f'类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}'
         if state['group']:
             filter_arg['group_id__in'] = state['group']
             if state['user']:
                 filter_arg['user_id__in'] = state['user']
                 logger.info('插件管理器',
-                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>中用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}</m>')
-                msg = f'已{"开启" if not state["bool"] else "关闭"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}中用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制\n类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]} {extra_msg}'
+                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>中用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>限流限制，<m>{t}</m>')
+                msg = f'已{"开启" if not state["bool"] else "关闭"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}中用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件限流限制\n{t} {extra_msg}'
             else:
                 filter_arg['user_id'] = None
                 logger.info('插件管理器',
-                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}</m>')
-                msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制\n类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}'
+                            f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>限流限制，<m>{t}</m>')
+                msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件限流限制\n{t} {extra_msg}'
         else:
             filter_arg['user_id__in'] = state['user']
             filter_arg['group_id'] = None
             logger.info('插件管理器',
-                        f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限，<m>类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}</m>')
-            msg = f'已{"启用" if not state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用限制\n类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]} {extra_msg}'
+                        f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>限流限制，<m>{t}</m>')
+            msg = f'已{"启用" if not state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件限流限制\n{t} {extra_msg}'
         await PluginTime.filter(name__in=state['plugin'], **filter_arg).delete()
         if state['bool']:
             pass
