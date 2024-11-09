@@ -34,7 +34,7 @@ from typing import Dict, List, Any, Optional
 from nonebot.exception import IgnoredException
 from nonebot.internal.matcher import current_event, current_matcher
 
-#屏蔽插件名称
+# 屏蔽插件名称
 HIDDEN_PLUGINS = [
     'nonebot_plugin_apscheduler',
     'nonebot_plugin_gocqhttp',
@@ -126,15 +126,28 @@ class PluginManager:
             p for p in plugin_list if p.show and p.module_name in load_plugins]
         for plugin in plugin_list:
             if await PluginDisable.filter(name=plugin.module_name, global_disable=True).exists():
-                plugin.status = True
+                plugin.status = "black"
             elif message_type == 'group':
-                plugin.status = not await PluginDisable.filter(name=plugin.module_name,
-                                                               group_id=session_id, user_id=None).exists()
+                if await PluginDisable.filter(name=plugin.module_name, group_id=session_id, user_id=None).exists():
+                    plugin.status = "black"
+                elif await PluginWithdraw.filter(name=plugin.module_name, group_id=session_id, user_id=None).exists():
+                    plugin.status = "green"
+                elif await PluginTime.filter(name=plugin.module_name, group_id=session_id, user_id=None).exists():
+                    plugin.status = "blue"
+                else:
+                    plugin.status = "orange"
             elif message_type == 'guild':
-                plugin.status = True
+                plugin.status = "orange"
             else:
-                plugin.status = not await PluginDisable.filter(name=plugin.module_name,
-                                                               user_id=session_id).exists()
+                if await PluginDisable.filter(name=plugin.module_name, user_id=session_id).exists():
+                    plugin.status = "black"
+                elif await PluginWithdraw.filter(name=plugin.module_name, user_id=session_id).exists():
+                    plugin.status = "green"
+                elif await PluginTime.filter(name=plugin.module_name, user_id=session_id).exists():
+                    plugin.status = "blue"
+                else:
+                    plugin.status = "orange"
+
             if plugin.matchers:
                 plugin.matchers.sort(key=lambda x: x.pm_priority)
         return plugin_list

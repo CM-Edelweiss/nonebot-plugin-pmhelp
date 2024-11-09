@@ -65,11 +65,11 @@ _✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_b
 ## 📋 效果
 
 帮助图(举例) <br>
-![_](https://img.picui.cn/free/2024/10/28/671f9c5ad8c30.jpg)<br>
-被禁用对应变黑<br>
-![_](https://img.picui.cn/free/2024/10/28/671f9c5af1fc1.jpg)<br>
+橙色正常，灰色禁用，绿色使用后撤回，蓝色限流
+![_](https://img.picui.cn/free/2024/11/09/672f2c027bd92.jpg)<br>
 webui(举例)<br>
 ![_](https://img.picui.cn/free/2024/10/28/671f9c5ae1e92.png)<br>
+![_](https://img.picui.cn/free/2024/11/09/672f2c5d2ac18.png)<br>
 
 
 ## ⚙️ 配置
@@ -116,7 +116,7 @@ show: true                           #是否展示在帮助图中
 usage: help                          #默认读取插件命令
 ```
 
-
+插件编写时：快捷生成卡片(默认读取PluginMetadata生成)
 ```python
 编写命令时实例
 xxx = on_command(
@@ -160,6 +160,7 @@ xxx = on_command(
 
 额外说明：
     如果要全局禁用/启用某一个用户，需要超级用户私聊Bot来使用命令
+    关闭的话也需要带数字，方便匹配
 
 举例: 
     -pm ban all 
@@ -174,5 +175,5 @@ xxx = on_command(
     当前群所有插件使用后10s后撤回
 ```
 
-## 丨💸鸣谢
+## 丨❤鸣谢
 - 来自[LittlePaimon](https://github.com/CMHopeSunshine/LittlePaimon)帮助插件代码

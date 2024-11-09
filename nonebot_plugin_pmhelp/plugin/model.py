@@ -27,8 +27,8 @@ class PluginInfo(BaseModel):
     """插件描述"""
     usage: Optional[str]
     """插件用法"""
-    status: Optional[bool]
-    """插件状态（无用项）"""
+    status: Optional[str]
+    """插件状态"""
     show: bool = True
     """是否展示"""
     priority: int = 99

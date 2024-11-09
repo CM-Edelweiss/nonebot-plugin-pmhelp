@@ -27,7 +27,7 @@ from .models import PluginDisable, PluginTime, PluginWithdraw
 
 __plugin_meta__ = PluginMetadata(
     name='PM帮助',
-    description='源于LittlePaimon的插件管理器插件，提供自动生成帮助图，并对群/私聊进行权限管理',
+    description='自动插件管理器，可以自动生成帮助图，并对群/私聊进行权限管理，例如禁用，限流，撤回',
     usage='help',
     type="application",
     homepage="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp",
@@ -53,7 +53,7 @@ manage_cmd = on_regex(
     state={
         "pm_name": "pm-ban|unban",
         "pm_description": "禁用|取消禁用插件的群|用户使用权限/进行限流/延迟撤回",
-        "pm_usage": "pm ban|unban <插件名>",
+        "pm_usage": "pm ban|unban <中/英插件名>",
         "pm_priority": 2,
     },
 )
@@ -195,8 +195,8 @@ async def _(state: T_State):
     if not state['plugin'] and state['plugin_no_exist']:
         await manage_cmd.finish(f'没有叫{" ".join(state["plugin_no_exist"])}的插件')
     extra_msg = f'，但没有叫{" ".join(state["plugin_no_exist"])}的插件。' if state['plugin_no_exist'] else '。'
-    cache_help.clear()
     filter_arg = {}
+    # 撤回
     if state["withdraw"]:
         if state['group']:
             filter_arg['group_id__in'] = state['group']
@@ -231,7 +231,7 @@ async def _(state: T_State):
                 else:
                     for user in state['user']:
                         await PluginWithdraw.update_or_create(name=plugin, user_id=user, group_id=None, time=state["withdraw"])
-
+    # 限流
     elif state['type']:
         state["type"] = ("frequency" if state['type'] == "f" else "time")
         if state['group']:
@@ -267,6 +267,7 @@ async def _(state: T_State):
                 else:
                     for user in state['user']:
                         await PluginTime.update_or_create(name=plugin, user_id=user, group_id=None, type=state['type'], time=state['time'])
+    # 进用
     else:
         if state['group']:
             filter_arg['group_id__in'] = state['group']

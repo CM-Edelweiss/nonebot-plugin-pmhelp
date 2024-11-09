@@ -33,25 +33,45 @@ async def draw_help(plugin_list: List[PluginInfo]):
                   color=(255, 255, 255, 0), mode='RGBA')
     orange_line = await load_image(IMAGE_PATH / 'orange.png')
     orange_name_bg = await load_image(IMAGE_PATH / 'orange_card.png')
-    black_line = await load_image(IMAGE_PATH / 'black.png')
-    black_name_bg = await load_image(IMAGE_PATH / 'black_card2.png')
     orange_bord = await load_image(IMAGE_PATH / 'orange_bord.png')
+
+    black_line = await load_image(IMAGE_PATH / 'black.png')
+    black_name_bg = await load_image(IMAGE_PATH / 'black_card.png')
     black_bord = await load_image(IMAGE_PATH / 'black_bord.png')
+
+    blue_line = await load_image(IMAGE_PATH / 'blue.png')
+    blue_name_bg = await load_image(IMAGE_PATH / 'blue_card.png')
+    blue_bord = await load_image(IMAGE_PATH / 'blue_bord.png')
+
+    green_line = await load_image(IMAGE_PATH / 'green.png')
+    green_name_bg = await load_image(IMAGE_PATH / 'green_card.png')
+    green_bord = await load_image(IMAGE_PATH / 'green_bord.png')
+
     await img.text(Pm_config.pm_name, 38, 40, fm.get('SourceHanSerifCN-Bold.otf', 72), 'black')
     await img.text(f'V{Pm_config.pm_version}', 1040, 75, fm.get('bahnschrift_regular', 36), 'black', 'right')
-    await img.text('<>内为必须，[]内为可选', 1040, 105, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
+    await img.text('灰色为禁用，蓝色为限流，绿色使用后撤回', 1040, 105, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
     await img.text(Pm_config.pm_text, 1040, 130, fm.get('SourceHanSerifCN-Bold.otf', 22), 'black', 'right')
 
     height_now = 172
     for plugin in plugin_list:
-        if not plugin.status:
-            plugin_line = PMImage(black_line)
-            plugin_name_bg = PMImage(black_name_bg)
-            matcher_card = PMImage(black_bord)
-        else:
-            plugin_line = PMImage(orange_line)
-            plugin_name_bg = PMImage(orange_name_bg)
-            matcher_card = PMImage(orange_bord)
+        match plugin.status:
+            case "black":
+                plugin_line = PMImage(black_line)
+                plugin_name_bg = PMImage(black_name_bg)
+                matcher_card = PMImage(black_bord)
+            case "blue":
+                plugin_line = PMImage(blue_line)
+                plugin_name_bg = PMImage(blue_name_bg)
+                matcher_card = PMImage(blue_bord)
+            case "green":
+                plugin_line = PMImage(green_line)
+                plugin_name_bg = PMImage(green_name_bg)
+                matcher_card = PMImage(green_bord)
+            case _:
+                plugin_line = PMImage(orange_line)
+                plugin_name_bg = PMImage(orange_name_bg)
+                matcher_card = PMImage(orange_bord)
+
         plugin_name = plugin.name.replace('\n', '')
         name_length = img.text_length(
             plugin_name, fm.get('SourceHanSerifCN-Bold.otf', 30))

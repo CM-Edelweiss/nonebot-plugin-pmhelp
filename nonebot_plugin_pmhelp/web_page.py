@@ -204,21 +204,21 @@ card = Card(
                visibleOn='${isLoad}',
                onEvent={
                    'change': {
-                       'actions': {
+                       'actions': [{
                            'actionType': 'ajax',
-                           'args':       {
-                               'api':      {
+                           'api':      {
                                    'url':    '/pmhelp/api/set_plugin_status',
-                                   'method': 'post'
-                               },
-                               'messages': {
-                                   'success': '${name}插件全局开关已设置为${event.data.value}',
-                                   'failed':  '插件设置失败'
-                               },
-                               'status':   '${event.data.value}',
-                               'plugin':   '${module_name}'
-                           }
-                       }
+                                   'method': 'post',
+                                   'data': {
+                                       'status':   '${event.data.value}',
+                                       'plugin':   '${module_name}'
+                                   },
+                                   'messages': {
+                                       'success': '插件设置成功',
+                                       'failed':  '插件设置失败'
+                                   }
+                                   }
+                       }]
                    }
                })
     ])
@@ -242,6 +242,7 @@ cards_curd = CardsCRUD(mode='cards',
                        footerToolbar=['switch-per-page', 'pagination'],
                        columnsCount=3,
                        card=card)
+
 operation_button = Flex(
     justify='center',
     items=[
