@@ -15,8 +15,8 @@ from nonebot import get_app, get_adapter
 from .web_page import login_page, admin_app
 from .models import PluginDisable, PluginTime
 from nonebot.adapters.onebot.v11 import Adapter
-from .plugin.manage import PluginManager, PluginInfo
 from fastapi import FastAPI, Header, HTTPException, Depends
+from .plugin.manage import PluginManager, PluginInfo, PluginWithdraw
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 
 requestAdaptor = """
@@ -287,6 +287,55 @@ async def init_web():
                     await PluginTime.update_or_create(name=name, group_id=int(ban[1:]), type=type, time=time)
             else:
                 await PluginTime.update_or_create(name=name, user_id=int(ban), type=type, time=time)
+        try:
+            from .utils import cache_help
+            cache_help.clear()
+        except Exception:
+            pass
+        return {
+            'status': 0,
+            'msg':    '插件设置成功'
+        }
+
+    @app.get('/pmhelp/api/get_withdraw_bans', response_class=JSONResponse, dependencies=[authentication()])
+    async def get_withdraw_bans(module_name: str):
+        """获取插件撤回状态api"""
+        result = []
+        bans = await PluginWithdraw.filter(name=module_name).all()
+        for ban in bans:
+            if ban.user_id and ban.group_id:
+                result.append(f'群{ban.group_id}.{ban.user_id}')
+            elif ban.group_id and not ban.user_id:
+                result.append(f'群{ban.group_id}')
+            elif ban.user_id and not ban.group_id:
+                result.append(f'{ban.user_id}')
+        return {
+            'status': 0,
+            'msg':    'ok',
+            'data':   {
+                'module_name': module_name,
+                'bans': result
+            }
+        }
+
+    @app.post('/pmhelp/api/set_withdraw_bans', response_class=JSONResponse, dependencies=[authentication()])
+    async def set_withdraw_bans(data: dict):
+        """保存插件撤回状态api"""
+        bans = data['bans']
+        name = data['module_name']
+        time = data["time"]
+        await PluginWithdraw.filter(name=name).delete()
+
+        for ban in bans:
+            if ban.startswith('群'):
+                if '.' in ban:
+                    group_id = int(ban.split('.')[0][1:])
+                    user_id = int(ban.split('.')[1])
+                    await PluginWithdraw.update_or_create(name=name, group_id=group_id, user_id=user_id, time=time)
+                else:
+                    await PluginWithdraw.update_or_create(name=name, group_id=int(ban[1:]),  time=time)
+            else:
+                await PluginWithdraw.update_or_create(name=name, user_id=int(ban),  time=time)
         try:
             from .utils import cache_help
             cache_help.clear()

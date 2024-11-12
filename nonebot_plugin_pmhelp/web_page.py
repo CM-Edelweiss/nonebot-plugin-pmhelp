@@ -10,7 +10,7 @@ from amis import (
 
 
 logo = Html(
-    html=f"""
+    html="""
 <p align="center">
     <a href="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/">
         <img src="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png"
@@ -59,7 +59,7 @@ login_form = Form(
 body = Wrapper(className="w-2/5 mx-auto my-0 m:w-full", body=login_form)
 login_page = Page(title="", body=[logo, body])
 
-
+# -------------禁用-------------------#
 ban_form = Form(title='',
                 api='post:/pmhelp/api/set_plugin_bans',
                 initApi='get:/pmhelp/api/get_plugin_bans?module_name=${module_name}',
@@ -80,11 +80,45 @@ ban_form = Form(title='',
                         source='get:/pmhelp/api/get_groups_and_members',
                     )])
 
-permission_button = ActionType.Dialog(label='使用权限',
-                                      icon='fa fa-pencil',
+permission_button = ActionType.Dialog(label='使用',
+                                      icon='fa fa-times-circle',
                                       dialog=Dialog(title='${name}使用权限设置', size='lg', body=ban_form))
 
+# -------------撤回-------------------#
+withdraw_form = Form(title='',
+                     api='post:/pmhelp/api/set_withdraw_bans',
+                     initApi='get:/pmhelp/api/get_withdraw_bans?module_name=${module_name}',
+                     body=[
+                         Transfer(
+                             type='tabs-transfer',
+                             name='bans',
+                             value='${bans}',
+                             label='',
+                             resultTitle='撤回管理列表',
+                             selectMode='tree',
+                             joinValues=False,
+                             extractValue=True,
+                             statistics=True,
+                             multiple=True,
+                             menuTpl='${left_label}',
+                             valueTpl='${right_label}',
+                             source='get:/pmhelp/api/get_groups_and_members',
+                         ),
+                         InputNumber(label='使用后多少s撤回',
+                                     name='time',
+                                     value=10,
+                                     min=1,
+                                     clearValueOnEmpty=True,
+                                     required=True,
+                                     )
+                     ])
 
+
+withdraw_button = ActionType.Dialog(label='撤回',
+                                    icon='fa fa-hourglass',
+                                    dialog=Dialog(title='${name}撤回管理设置', size='lg', body=withdraw_form))
+
+# -------------限流-------------------#
 xl_form = Form(title='',
                api='post:/pmhelp/api/set_message_bans',
                initApi='get:/pmhelp/api/get_message_bans?module_name=${module_name}',
@@ -128,11 +162,11 @@ xl_form = Form(title='',
                                )
                ])
 
-xl_button = ActionType.Dialog(label='限流管理',
-                              icon='fa fa-pencil',
+xl_button = ActionType.Dialog(label='限流',
+                              icon='fa fa-spinner',
                               dialog=Dialog(title='${name}限流管理设置', size='lg', body=xl_form))
 
-
+# -------------信息-------------------#
 command_form = InputSubForm(name='matchers',
                             label='命令列表',
                             multiple=True,
@@ -187,14 +221,14 @@ detail_button = ActionType.Dialog(label='信息',
                                   icon='fa fa-pencil',
                                   dialog=Dialog(title='${name}信息设置', size='lg', body=[tips_alert, detail_form]))
 
-
+# -------------卡片-------------------#
 card = Card(
     header=Card.Header(title='$name',
                        subTitle='$module_name',
                        description='$description',
                        avatarText='$name',
                        avatarTextClassName='overflow-hidden'),
-    actions=[detail_button, permission_button, xl_button],
+    actions=[detail_button, permission_button, xl_button, withdraw_button],
     toolbar=[
         Tpl(tpl='未加载', className='label label-warning', hiddenOn='${isLoad}'),
         Switch(name='enable',
