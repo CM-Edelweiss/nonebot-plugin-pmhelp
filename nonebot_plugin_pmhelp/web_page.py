@@ -5,27 +5,50 @@ from amis import (
     Remark, InputPassword, AmisAPI,
     Wrapper, Horizontal, Form, Transfer,
     DisplayModeEnum, InputText, Textarea, Switch,
-    ActionType, Dialog, InputSubForm, LevelEnum,
+    ActionType, Dialog, InputSubForm, LevelEnum, Action
 )
 
+# -------------css-------------------#
+# 背景图
+background_css = {
+    "position": "absolute",
+    "top": "0",
+    "left": "0",
+    "width": "100%",
+    "height": "100%",
+    "background": "url('https://www.loliapi.com/acg/') no-repeat center center",
+    "background-size": "cover",
+    "backdrop-filter": "blur(10px)",
+    "-webkit-backdrop-filter": "blur(10px)",
+}
+# 圆角/透明
+rounded_css_9 = {
+    "background-color": "rgba(255, 255, 255, 0.9)",
+    "border-radius": "2em",
+}
+rounded_css_8 = {
+    "background-color": "rgba(255, 255, 255, 0.8)",
+    "border-radius": "2em",
+}
 
-logo = Html(
+# -------------登录-------------------#
+login_logo = Html(
     html="""
 <p align="center">
     <a href="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp/">
-        <img src="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png"
-         width="256" height="256" alt="PMHELP">
+        <img src="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png" width="256" height="256" alt="PMHELP">
     </a>
 </p>
 <h1 align="center">Nonebot-plugin-pmhelp 控制台</h1>
 <div align="center">
     <a href="https://github.com/CM-Edelweiss/nonebot-plugin-pmhelp" target="_blank">
-    Github仓库</a>
+        Github仓库</a>
 </div>
 <br>
 <br>
 """
 )
+
 login_api = AmisAPI(
     url="/pmhelp/api/login",
     method="post",
@@ -37,27 +60,36 @@ login_api = AmisAPI(
     """,
 )
 
-login_form = Form(
+login_body = Wrapper(className="w-2/5 mx-auto my-0 m:w-full", body=Form(
     api=login_api,
     title="",
     body=[
+        login_logo,
         InputText(
             name="username",
             label="用户名",
-            labelRemark=Remark(shape="circle", content="后台管理用户名，默认为pmhelp"),
+            labelRemark=Remark(
+                shape="circle", content="后台管理用户名，默认为pmhelp"),
         ),
         InputPassword(
             name="password",
             label="密码",
-            labelRemark=Remark(shape="circle", content="后台管理密码，默认为admin"),
+            labelRemark=Remark(
+                shape="circle", content="后台管理密码，默认为admin"),
         ),
     ],
     mode=DisplayModeEnum.horizontal,
-    horizontal=Horizontal(left=3, right=9, offset=5),
+    style=rounded_css_9,
+    actions=[Action(label='登录', level=LevelEnum.primary, type='submit', style={
+        "display": "table",
+        "margin": "0 auto",
+        "border-radius": "2em",
+    })],
+    horizontal=Horizontal(left=3, right=7, offset=5),
     redirect="/pmhelp/admin",
-)
-body = Wrapper(className="w-2/5 mx-auto my-0 m:w-full", body=login_form)
-login_page = Page(title="", body=[logo, body])
+))
+
+login_page = Page(title="", body=login_body, style=background_css)
 
 # -------------禁用-------------------#
 ban_form = Form(title='',
@@ -229,6 +261,7 @@ card = Card(
                        avatarText='$name',
                        avatarTextClassName='overflow-hidden'),
     actions=[detail_button, permission_button, xl_button, withdraw_button],
+    style=rounded_css_9,
     toolbar=[
         Tpl(tpl='未加载', className='label label-warning', hiddenOn='${isLoad}'),
         Switch(name='enable',
@@ -267,9 +300,14 @@ cards_curd = CardsCRUD(mode='cards',
                            'body': [
                                InputText(name='keywords_name', label='插件名'),
                                InputText(name='keywords_description',
-                                         label='插件描述')
-                           ]
+                                         label='插件描述'),
+                               Action(
+                                   label='搜索', level=LevelEnum.primary, type='submit')
+                           ],
+                           "style": rounded_css_9,
+                           "mode": DisplayModeEnum.inline
                        },
+                       style=rounded_css_8,
                        perPage=12,
                        autoJumpToTopOnPagerChange=True,
                        placeholder='暂无插件信息',
@@ -286,5 +324,5 @@ operation_button = Flex(
             confirmText='该操作将会重新刷新群和好友列表',
             level=LevelEnum.info,
         )])
-admin_app = Page(title="PMHELP", body=[
-                 operation_button, Divider(), cards_curd])
+admin_app = Page(title="PMHELP插件管理器", body=[
+                 operation_button, Divider(), cards_curd], style=background_css)
