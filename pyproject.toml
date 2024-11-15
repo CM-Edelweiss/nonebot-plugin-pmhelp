@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-pmhelp"
-version = "1.3.7"
+version = "1.3.8"
 description = "源于LittlePaimon的插件管理器插件，提供自动生成帮助图，并对群/私聊进行权限管理"
 authors = ["CM-Edelweiss <2633668472@qq.com>"]
 readme = "README.md"

@@ -1,11 +1,8 @@
 import datetime
 from typing import List
 from tortoise import fields
-from nonebot import require
 from tortoise.models import Model
 from .Path import MANAGER_DB_PATH
-# 先导入(注意格式化移动)
-require("nonebot_plugin_tortoise_orm")
 from nonebot_plugin_tortoise_orm import add_model
 
 add_model(
@@ -16,6 +13,7 @@ add_model(
 
 
 class PluginPermission(Model):
+    # 权限
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
     name: str = fields.TextField()
     """插件名称"""
@@ -35,6 +33,7 @@ class PluginPermission(Model):
 
 
 class PluginDisable(Model):
+    # 禁用
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
     name: str = fields.TextField()
     """插件名称"""
@@ -50,9 +49,12 @@ class PluginDisable(Model):
 
 
 class PluginWithdraw(Model):
+    # 撤回
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
     name: str = fields.TextField()
     """插件名称"""
+    global_withdraw: bool = fields.BooleanField(default=False)
+    """全局撤回"""
     user_id: int = fields.IntField(null=True)
     """用户id"""
     group_id: int = fields.IntField(null=True)
@@ -65,9 +67,12 @@ class PluginWithdraw(Model):
 
 
 class PluginTime(Model):
+    # 限制
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
     name: str = fields.TextField()
     """插件名称"""
+    global_time: bool = fields.BooleanField(default=False)
+    """全局限制"""
     user_id: int = fields.IntField(null=True)
     """用户id"""
     group_id: int = fields.IntField(null=True)
@@ -82,6 +87,7 @@ class PluginTime(Model):
 
 
 class PluginStatistics(Model):
+    # 统计
     id = fields.IntField(pk=True, generated=True, auto_increment=True)
     plugin_name: str = fields.TextField()
     """插件名称"""

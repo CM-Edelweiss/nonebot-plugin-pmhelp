@@ -127,6 +127,11 @@ class PluginManager:
         for plugin in plugin_list:
             if await PluginDisable.filter(name=plugin.module_name, global_disable=True).exists():
                 plugin.status = "black"
+            elif await PluginWithdraw.filter(name=plugin.module_name, global_withdraw=True).exists():
+                plugin.status = "green"
+            elif await PluginTime.filter(name=plugin.module_name, global_time=True).exists():
+                plugin.status = "blue"
+
             elif message_type == 'group':
                 if await PluginDisable.filter(name=plugin.module_name, group_id=session_id, user_id=None).exists():
                     plugin.status = "black"
@@ -193,7 +198,8 @@ async def _(event: MessageEvent, bot: Bot, matcher: Matcher):
             if None in user_ids or event.user_id in user_ids:
                 is_ignored = True
         # 限流
-        if id := await PluginTime.get_or_none(name=matcher.plugin_name, user_id=event.user_id, group_id=None):
+        if (id := await PluginTime.get_or_none(name=matcher.plugin_name, global_time=True)) or \
+                (id := await PluginTime.get_or_none(name=matcher.plugin_name, user_id=event.user_id, group_id=None)):
             if id.type == "time":
                 if freqLimiter.check(f'{matcher.plugin_name}-{event.user_id}'):
                     freqLimiter.start(
@@ -268,7 +274,8 @@ async def _(bot: Bot, exception: Optional[Exception], api: str, data: Any, resul
         return
     try:
         tasks = []
-        if id := await PluginWithdraw.get_or_none(name=matcher.plugin_name, user_id=event.user_id, group_id=None):
+        if (id := await PluginWithdraw.get_or_none(name=matcher.plugin_name, global_withdraw=True)) or \
+                (id := await PluginWithdraw.get_or_none(name=matcher.plugin_name, user_id=event.user_id, group_id=None)):
             tasks.append(asyncio.ensure_future(withdraw_message(
                 bot=bot, message_id=result["message_id"], time=id.time)))
         elif isinstance(event, GroupMessageEvent) and (

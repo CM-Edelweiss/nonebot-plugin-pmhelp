@@ -1,9 +1,6 @@
 from pathlib import Path
 from .logger import logger
-from nonebot import require
 from .pm_config import Pm_config
-# 先导入(注意格式化移动)
-require("nonebot_plugin_localstore")
 import nonebot_plugin_localstore as store
 
 # 资源路径

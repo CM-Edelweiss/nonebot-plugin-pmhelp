@@ -13,17 +13,15 @@ from PIL import Image
 from io import BytesIO
 from pathlib import Path
 from .logger import logger
-from nonebot import require
 from ruamel.yaml import YAML
 from nonebot import get_driver
 from nonebot.rule import Rule
 from collections import defaultdict
 from ssl import SSLCertVerificationError
 from nonebot.params import CommandArg, Depends
-from nonebot.adapters.onebot.v11 import Message, Bot
-# 先导入(注意格式化移动)
-require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler
+from nonebot.adapters.onebot.v11 import Message, Bot
+
 
 # 图片缓存
 cache_help = {}

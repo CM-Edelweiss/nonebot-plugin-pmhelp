@@ -251,8 +251,10 @@ async def init_web():
     async def get_message_bans(module_name: str):
         """获取插件限流状态api"""
         result = []
+        global_time = False
         bans = await PluginTime.filter(name=module_name).all()
         for ban in bans:
+            global_time = True if ban.global_time else False
             if ban.user_id and ban.group_id:
                 result.append(f'群{ban.group_id}.{ban.user_id}')
             elif ban.group_id and not ban.user_id:
@@ -264,7 +266,8 @@ async def init_web():
             'msg':    'ok',
             'data':   {
                 'module_name': module_name,
-                'bans': result
+                'bans': result,
+                'show': global_time
             }
         }
 
@@ -276,17 +279,19 @@ async def init_web():
         type = data['type']
         time = data["time"]
         await PluginTime.filter(name=name).delete()
-
-        for ban in bans:
-            if ban.startswith('群'):
-                if '.' in ban:
-                    group_id = int(ban.split('.')[0][1:])
-                    user_id = int(ban.split('.')[1])
-                    await PluginTime.update_or_create(name=name, group_id=group_id, user_id=user_id, type=type, time=time)
+        if ("all" in data) and data["all"]:
+            await PluginTime.create(name=name, global_time=True, type=type, time=time)
+        else:
+            for ban in bans:
+                if ban.startswith('群'):
+                    if '.' in ban:
+                        group_id = int(ban.split('.')[0][1:])
+                        user_id = int(ban.split('.')[1])
+                        await PluginTime.update_or_create(name=name, group_id=group_id, user_id=user_id, type=type, time=time)
+                    else:
+                        await PluginTime.update_or_create(name=name, group_id=int(ban[1:]), type=type, time=time)
                 else:
-                    await PluginTime.update_or_create(name=name, group_id=int(ban[1:]), type=type, time=time)
-            else:
-                await PluginTime.update_or_create(name=name, user_id=int(ban), type=type, time=time)
+                    await PluginTime.update_or_create(name=name, user_id=int(ban), type=type, time=time)
         try:
             from .utils import cache_help
             cache_help.clear()
@@ -301,20 +306,24 @@ async def init_web():
     async def get_withdraw_bans(module_name: str):
         """获取插件撤回状态api"""
         result = []
+        global_withdraw = False
         bans = await PluginWithdraw.filter(name=module_name).all()
         for ban in bans:
+            global_withdraw = True if ban.global_withdraw else False
             if ban.user_id and ban.group_id:
                 result.append(f'群{ban.group_id}.{ban.user_id}')
             elif ban.group_id and not ban.user_id:
                 result.append(f'群{ban.group_id}')
             elif ban.user_id and not ban.group_id:
                 result.append(f'{ban.user_id}')
+
         return {
             'status': 0,
             'msg':    'ok',
             'data':   {
                 'module_name': module_name,
-                'bans': result
+                'bans': result,
+                'show': global_withdraw
             }
         }
 
@@ -325,17 +334,19 @@ async def init_web():
         name = data['module_name']
         time = data["time"]
         await PluginWithdraw.filter(name=name).delete()
-
-        for ban in bans:
-            if ban.startswith('群'):
-                if '.' in ban:
-                    group_id = int(ban.split('.')[0][1:])
-                    user_id = int(ban.split('.')[1])
-                    await PluginWithdraw.update_or_create(name=name, group_id=group_id, user_id=user_id, time=time)
+        if ("all" in data) and data["all"]:
+            await PluginWithdraw.create(name=name, global_withdraw=True, time=time)
+        else:
+            for ban in bans:
+                if ban.startswith('群'):
+                    if '.' in ban:
+                        group_id = int(ban.split('.')[0][1:])
+                        user_id = int(ban.split('.')[1])
+                        await PluginWithdraw.update_or_create(name=name, group_id=group_id, user_id=user_id, time=time)
+                    else:
+                        await PluginWithdraw.update_or_create(name=name, group_id=int(ban[1:]),  time=time)
                 else:
-                    await PluginWithdraw.update_or_create(name=name, group_id=int(ban[1:]),  time=time)
-            else:
-                await PluginWithdraw.update_or_create(name=name, user_id=int(ban),  time=time)
+                    await PluginWithdraw.update_or_create(name=name, user_id=int(ban),  time=time)
         try:
             from .utils import cache_help
             cache_help.clear()
