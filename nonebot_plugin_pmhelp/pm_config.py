@@ -23,6 +23,8 @@ class Config(BaseModel):
     pm_username: str = "pmhelp"
     # 后台管理密码
     pm_password: str = "admin"
+    # 后台管理一列卡片数量
+    pm_columnscount : int = 3
     # 后台管理token密钥
     pm_secret_key: str = "r99nxsvr93a5i241mvisjydxspiwxgpiyoh9nas35036fkxd7y"
 

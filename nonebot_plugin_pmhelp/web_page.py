@@ -7,7 +7,7 @@ from amis import (
     DisplayModeEnum, InputText, Textarea, Switch,
     ActionType, Dialog, InputSubForm, LevelEnum, Action
 )
-
+from .pm_config import Pm_config
 # -------------css-------------------#
 # 背景图
 background_css = {
@@ -312,7 +312,8 @@ cards_curd = CardsCRUD(mode='cards',
                        autoJumpToTopOnPagerChange=True,
                        placeholder='暂无插件信息',
                        footerToolbar=['switch-per-page', 'pagination'],
-                       columnsCount=3,
+                       columnsCount=Pm_config.pm_columnscount if isinstance(
+                           Pm_config.pm_columnscount, int) else 3,
                        card=card)
 
 operation_button = Flex(

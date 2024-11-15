@@ -68,8 +68,8 @@ _✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_b
 橙色正常，灰色禁用，绿色使用后撤回，蓝色限流
 ![_](https://img.picui.cn/free/2024/11/09/672f2c027bd92.jpg)<br>
 webui(举例)<br>
-![_](https://img.picui.cn/free/2024/10/28/671f9c5ae1e92.png)<br>
-![_](https://img.picui.cn/free/2024/11/09/672f2c5d2ac18.png)<br>
+![_](https://img.picui.cn/free/2024/11/15/6737330107388.png)<br>
+![_](https://img.picui.cn/free/2024/11/15/673732ee852a7.png)<br>
 
 
 ## ⚙️ 配置
@@ -88,6 +88,7 @@ webui(举例)<br>
 | pm_enable_web| 否 | True |后台管理开关 |
 | pm_username| 否 | pmhelp |后台管理用户名 |
 | pm_password| 否 | admin | 后台管理密码 |
+| pm_columnscount| 否 | 3 | web一列卡片数量 |
 | pm_secret_key| 否 | ... | 后台管理token密钥 |
 
 
