@@ -42,7 +42,7 @@ HIDDEN_PLUGINS = [
     'nonebot_plugin_imageutils',
     'nonebot_plugin_localstore',
     'nonebot_plugin_tortoise_orm',
-    'nonebot_plugin_pmhelp',
+    'nonebot_plugin_manageweb',
     'nonebot_plugin_alconna',
     'nonebot_plugin_uninfo',
     'single_session',

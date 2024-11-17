@@ -205,15 +205,8 @@ async def _(state: T_State):
     filter_arg = {}
     # 撤回
     if state["withdraw"]:
-        if not state['group'] and not state['user'] and (state["user_id"] in SUPERUSERS):
-            for plugin in state['plugin']:
-                await PluginWithdraw.filter(name=plugin, global_withdraw=True).delete()
-                if not state['bool']:
-                    await PluginWithdraw.create(name=plugin, global_withdraw=True, time=state["withdraw"])
-            logger.info('插件管理器',
-                        f'已{"<g>启用全局</g>" if not state["bool"] else "<r>禁用全局</r>"}"]的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}')
-            msg = f'已{"启用全局" if not state["bool"] else "禁用全局"}插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]} {extra_msg}'
-            await manage_cmd.finish(msg)
+        if state["user_id"] in SUPERUSERS:
+            await PluginWithdraw.filter(name__in=state['plugin'], global_withdraw=True).delete()
         if state['group']:
             filter_arg['group_id__in'] = state['group']
             if state['user']:
@@ -226,17 +219,18 @@ async def _(state: T_State):
                 logger.info('插件管理器',
                             f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}')
                 msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}{extra_msg}'
-        else:
+        elif state['user']:
             filter_arg['user_id__in'] = state['user']
             filter_arg['group_id'] = None
             logger.info('插件管理器',
                         f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}')
             msg = f'已{"启用" if not state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}{extra_msg}'
-        await PluginWithdraw.filter(name__in=state['plugin'], global_withdraw=True).delete()
+        elif state["user_id"] in SUPERUSERS:
+            logger.info('插件管理器',
+                        f'已{"<g>启用全局</g>" if not state["bool"] else "<r>禁用全局</r>"}插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]}')
+            msg = f'已{"启用全局" if not state["bool"] else "禁用全局"}插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}的延迟撤回{"" if  state["bool"] else ",时间:"+state["withdraw"]} {extra_msg}'
         await PluginWithdraw.filter(name__in=state['plugin'], **filter_arg).delete()
-        if state['bool']:
-            pass
-        else:
+        if not state['bool']:
             for plugin in state['plugin']:
                 if state['group']:
                     for group in state['group']:
@@ -245,22 +239,17 @@ async def _(state: T_State):
                                 await PluginWithdraw.update_or_create(name=plugin, group_id=group, user_id=user, time=state["withdraw"])
                         else:
                             await PluginWithdraw.update_or_create(name=plugin, group_id=group, user_id=None, time=state["withdraw"])
-                else:
+                elif state['user']:
                     for user in state['user']:
                         await PluginWithdraw.update_or_create(name=plugin, user_id=user, group_id=None, time=state["withdraw"])
+                else:
+                    await PluginWithdraw.create(name=plugin, global_withdraw=True, time=state["withdraw"])
     # 限流
     elif state['type']:
         state["type"] = ("frequency" if state['type'] == "f" else "time")
-        t = '.' if state['bool'] else f'类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}'
-        if not state['group'] and not state['user'] and (state["user_id"] in SUPERUSERS):
-            for plugin in state['plugin']:
-                await PluginTime.filter(name=plugin, global_time=True).delete()
-                if not state['bool']:
-                    await PluginTime.create(name=plugin, global_time=True, type=state['type'], time=state['time'])
-            logger.info('插件管理器',
-                        f'已{"<g>启用全局</g>" if not state["bool"] else "<r>禁用全局</r>"}<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>限流限制，<m>{t}</m>')
-            msg = f'已{"启用全局" if not state["bool"] else "禁用全局"}{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件限流限制\n{t} {extra_msg}'
-            await manage_cmd.finish(msg)
+        t = '' if state['bool'] else f'类型:{"倒计时类" if state["type"] == "time" else "每分钟类"}\n数值:{state["time"]}'
+        if state["user_id"] in SUPERUSERS:
+            await PluginTime.filter(name__in=state['plugin'], global_time=True).delete()
         if state['group']:
             filter_arg['group_id__in'] = state['group']
             if state['user']:
@@ -273,17 +262,20 @@ async def _(state: T_State):
                 logger.info('插件管理器',
                             f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>限流限制，<m>{t}</m>')
                 msg = f'已{"启用" if not state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件限流限制\n{t} {extra_msg}'
-        else:
+        elif state['user']:
             filter_arg['user_id__in'] = state['user']
             filter_arg['group_id'] = None
             logger.info('插件管理器',
                         f'已{"<g>启用</g>" if not state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>限流限制，<m>{t}</m>')
             msg = f'已{"启用" if not state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件限流限制\n{t} {extra_msg}'
-        await PluginTime.filter(name__in=state['plugin'], global_time=True).delete()
-        await PluginTime.filter(name__in=state['plugin'], **filter_arg).delete()
-        if state['bool']:
-            pass
+        elif state["user_id"] in SUPERUSERS:
+            logger.info('插件管理器',
+                        f'已{"<g>启用全局</g>" if not state["bool"] else "<r>禁用全局</r>"}<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>限流限制，<m>{t}</m>')
+            msg = f'已{"启用全局" if not state["bool"] else "禁用全局"}{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件限流限制\n{t} {extra_msg}'
         else:
+            await manage_cmd.finish("你没有权限使用该命令", at_sender=True)
+        await PluginTime.filter(name__in=state['plugin'], **filter_arg).delete()
+        if not state['bool']:
             for plugin in state['plugin']:
                 if state['group']:
                     for group in state['group']:
@@ -292,21 +284,15 @@ async def _(state: T_State):
                                 await PluginTime.update_or_create(name=plugin, group_id=group, user_id=user, type=state['type'], time=state['time'])
                         else:
                             await PluginTime.update_or_create(name=plugin, group_id=group, user_id=None, type=state['type'], time=state['time'])
-                else:
+                elif state['user']:
                     for user in state['user']:
                         await PluginTime.update_or_create(name=plugin, user_id=user, group_id=None, type=state['type'], time=state['time'])
+                else:
+                    await PluginTime.create(name=plugin, global_time=True, type=state['type'], time=state['time'])
     # 禁用
     else:
-        if not state['group'] and not state['user'] and (state["user_id"] in SUPERUSERS):
-            for plugin in state['plugin']:
-                if state['bool']:
-                    await PluginDisable.filter(name=plugin, global_disable=True).delete()
-                else:
-                    await PluginDisable.create(name=plugin, global_disable=True)
-            logger.info('插件管理器',
-                        f'已{"<g>启用全局</g>" if not state["bool"] else "<r>禁用全局</r>"}<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限')
-            msg = f'已{"启用全局" if not state["bool"] else "禁用全局"}{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用权限 {extra_msg}'
-            await manage_cmd.finish(msg)
+        if state["user_id"] in SUPERUSERS:
+            await PluginDisable.filter(name__in=state['plugin'], global_disable=True).delete()
         if state['group']:
             filter_arg['group_id__in'] = state['group']
             if state['user']:
@@ -319,13 +305,18 @@ async def _(state: T_State):
                 logger.info('插件管理器',
                             f'已{"<g>启用</g>" if state["bool"] else "<r>禁用</r>"}群<m>{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}</m>的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>使用权限')
                 msg = f'已{"启用" if state["bool"] else "禁用"}群{" ".join(map(str, state["group"])) if not state["group_all"] else "全部"}的插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}使用权限{extra_msg}'
-        else:
+        elif state['user']:
             filter_arg['user_id__in'] = state['user']
             filter_arg['group_id'] = None
             logger.info('插件管理器',
                         f'已{"<g>启用</g>" if state["bool"] else "<r>禁用</r>"}用户<m>{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}</m>的插件<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}</m>使用权限')
             msg = f'已{"启用" if state["bool"] else "禁用"}用户{" ".join(map(str, state["user"])) if not state["user_all"] else "全部"}的插件{" ".join(state["plugin"]) if not state["is_all"] else "全部"}使用权限{extra_msg}'
-        await PluginDisable.filter(name__in=state['plugin'], global_disable=True).delete()
+        elif state["user_id"] in SUPERUSERS:
+            logger.info('插件管理器',
+                        f'已{"<g>启用全局</g>" if state["bool"] else "<r>禁用全局</r>"}<m>{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件</m>使用权限')
+            msg = f'已{"启用全局" if state["bool"] else "禁用全局"}{" ".join(state["plugin"]) if not state["is_all"] else "全部"}插件使用权限 {extra_msg}'
+        else:
+            await manage_cmd.finish("你没有权限使用该命令", at_sender=True)
         if state['bool']:
             await PluginDisable.filter(name__in=state['plugin'], **filter_arg).delete()
         else:
@@ -337,10 +328,11 @@ async def _(state: T_State):
                                 await PluginDisable.update_or_create(name=plugin, group_id=group, user_id=user)
                         else:
                             await PluginDisable.update_or_create(name=plugin, group_id=group, user_id=None)
-                else:
+                elif state['user']:
                     for user in state['user']:
                         await PluginDisable.update_or_create(name=plugin, user_id=user, group_id=None)
-
+                else:
+                    await PluginDisable.create(name=plugin, global_disable=True)
     await manage_cmd.finish(msg)
 
 
