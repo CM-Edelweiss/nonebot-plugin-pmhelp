@@ -60,6 +60,16 @@ class UserModel(BaseModel):
     password: str
 
 
+try:
+    import nonebot_plugin_manageweb
+    from nonebot_plugin_manageweb.utils import responseAdaptor, authentication
+    from nonebot_plugin_manageweb.web.page.main import admin_app as admin
+    from amis import PageSchema
+    web = True
+except Exception:
+    web = False
+
+
 @DRIVER.on_startup
 async def init_web():
     """主程序"""
@@ -67,10 +77,16 @@ async def init_web():
         return
     try:
         app: FastAPI = get_app()
-        logger.info(
-            "PM Web UI",
-            f"<g>启用成功</g>，默认地址为<m>http://{DRIVER.config.host}:{DRIVER.config.port}/pmhelp/login</m>",
-        )
+        if web:
+            logger.info(
+                "PM Web UI",
+                f"<g>启用成功</g>，已接入<m>[MW webui]</m>",
+            )
+        else:
+            logger.info(
+                "PM Web UI",
+                f"<g>启用成功</g>，默认地址为<m>http://{DRIVER.config.host}:{DRIVER.config.port}/pmhelp/login</m>",
+            )
     except Exception as e:
         return logger.info('PM Web UI', f'启用<r>失败：{e}</r>')
 
@@ -371,27 +387,31 @@ async def init_web():
             'status': 0,
             'msg':    '插件信息设置成功'
         }
+    if web:
+        admin_page = PageSchema(url='/pmhelp', icon='fa fa-gears', label='PMHELP管理器',
+                                schema=admin_app)
+        admin.pages[0].children.append(admin_page)
+    else:
+        @app.get("/pmhelp", response_class=RedirectResponse)
+        async def redirect_page():
+            return RedirectResponse("/pmhelp/login")
 
-    @app.get("/pmhelp", response_class=RedirectResponse)
-    async def redirect_page():
-        return RedirectResponse("/pmhelp/login")
+        @app.get("/pmhelp/login", response_class=HTMLResponse)
+        async def login_page_app():
+            return login_page.render(
+                cdn='https://npm.onmicrosoft.cn',
+                site_title="登录 | PMHELP 后台管理",
+                site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
+                theme="ang"
+            )
 
-    @app.get("/pmhelp/login", response_class=HTMLResponse)
-    async def login_page_app():
-        return login_page.render(
-            cdn='https://npm.onmicrosoft.cn',
-            site_title="登录 | PMHELP 后台管理",
-            site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
-            theme="ang"
-        )
-
-    @app.get("/pmhelp/admin", response_class=HTMLResponse)
-    async def admin_page_app():
-        return admin_app.render(
-            cdn="https://npm.onmicrosoft.cn",
-            site_title="PMHELP 后台管理",
-            site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
-            theme="ang",
-            requestAdaptor=requestAdaptor,
-            responseAdaptor=responseAdaptor,
-        )
+        @app.get("/pmhelp/admin", response_class=HTMLResponse)
+        async def admin_page_app():
+            return admin_app.render(
+                cdn="https://npm.onmicrosoft.cn",
+                site_title="PMHELP 后台管理",
+                site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
+                theme="ang",
+                requestAdaptor=requestAdaptor,
+                responseAdaptor=responseAdaptor,
+            )

@@ -88,7 +88,6 @@ webui(举例)<br>
 | pm_enable_web| 否 | True |后台管理开关 |
 | pm_username| 否 | pmhelp |后台管理用户名 |
 | pm_password| 否 | admin | 后台管理密码 |
-| pm_columnscount| 否 | 3 | web一列卡片数量 |
 | pm_secret_key| 否 | ... | 后台管理token密钥 |
 
 

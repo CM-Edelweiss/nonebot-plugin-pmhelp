@@ -1,7 +1,7 @@
 from amis import (
     Flex, Divider, Radios,
     InputNumber, Alert, Card, Tpl,
-    CardsCRUD, Static, Page, Html,
+    Cards, CRUD, Static, Page, Html,
     Remark, InputPassword, AmisAPI,
     Wrapper, Horizontal, Form, Transfer,
     DisplayModeEnum, InputText, Textarea, Switch,
@@ -22,6 +22,12 @@ background_css = {
     "-webkit-backdrop-filter": "blur(10px)",
 }
 # 圆角/透明
+rounded_css_curd = {
+    "background-color": "rgba(255, 255, 255, 0.9)",
+    "border-radius": "2em",
+    "width": "350px",
+    "transform": "translateX(5%)"
+}
 rounded_css_9 = {
     "background-color": "rgba(255, 255, 255, 0.9)",
     "border-radius": "2em",
@@ -273,7 +279,8 @@ card = Card(
                        avatarText='$name',
                        avatarTextClassName='overflow-hidden'),
     actions=[detail_button, permission_button, xl_button, withdraw_button],
-    style=rounded_css_9,
+    style=rounded_css_curd,
+    className='m-l',
     toolbar=[
         Tpl(tpl='未加载', className='label label-warning', hiddenOn='${isLoad}'),
         Switch(name='enable',
@@ -302,6 +309,11 @@ card = Card(
                })
     ])
 
+
+class CardsCRUD(CRUD, Cards):
+    """卡片CRUD"""
+
+
 cards_curd = CardsCRUD(mode='cards',
                        title='',
                        syncLocation=False,
@@ -324,8 +336,6 @@ cards_curd = CardsCRUD(mode='cards',
                        autoJumpToTopOnPagerChange=True,
                        placeholder='暂无插件信息',
                        footerToolbar=['switch-per-page', 'pagination'],
-                       columnsCount=Pm_config.pm_columnscount if isinstance(
-                           Pm_config.pm_columnscount, int) else 3,
                        card=card)
 
 operation_button = Flex(
