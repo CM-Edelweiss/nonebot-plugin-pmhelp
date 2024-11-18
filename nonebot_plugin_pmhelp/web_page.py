@@ -1,13 +1,12 @@
 from amis import (
-    Flex, Divider, Radios,
-    InputNumber, Alert, Card, Tpl,
+    Radios, InputNumber, Alert, Card, Tpl,
     Cards, CRUD, Static, Page, Html,
     Remark, InputPassword, AmisAPI,
     Wrapper, Horizontal, Form, Transfer,
     DisplayModeEnum, InputText, Textarea, Switch,
     ActionType, Dialog, InputSubForm, LevelEnum, Action
 )
-from .pm_config import Pm_config
+
 # -------------css-------------------#
 # 背景图
 background_css = {
@@ -335,17 +334,16 @@ cards_curd = CardsCRUD(mode='cards',
                        perPage=12,
                        autoJumpToTopOnPagerChange=True,
                        placeholder='暂无插件信息',
-                       footerToolbar=['switch-per-page', 'pagination'],
+                       headerToolbar=[
+                           'switch-per-page',
+                           'pagination',
+                           ActionType.Ajax(
+                               label='刷新用户列表',
+                               api='/pmhelp/api/get_groups_flushed',
+                               confirmText='该操作将会重新刷新群和好友列表',
+                               level=LevelEnum.info,
+                           )],
+                       footerToolbar=[],
                        card=card)
 
-operation_button = Flex(
-    justify='center',
-    items=[
-        ActionType.Ajax(
-            label='刷新用户列表',
-            api='/pmhelp/api/get_groups_flushed',
-            confirmText='该操作将会重新刷新群和好友列表',
-            level=LevelEnum.info,
-        )])
-admin_app = Page(title="PMHELP插件管理器", body=[
-                 operation_button, Divider(), cards_curd], style=background_css)
+admin_app = Page(title="PMHELP插件管理器", body=cards_curd, style=background_css)

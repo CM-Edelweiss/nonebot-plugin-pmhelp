@@ -9,6 +9,7 @@ from typing import (
     Tuple,
     List,
 )
+from jose import jwt
 from PIL import Image
 from io import BytesIO
 from pathlib import Path
@@ -16,10 +17,12 @@ from .logger import logger
 from ruamel.yaml import YAML
 from nonebot import get_driver
 from nonebot.rule import Rule
+from .pm_config import Pm_config
 from collections import defaultdict
 from ssl import SSLCertVerificationError
 from nonebot.params import CommandArg, Depends
 from nonebot_plugin_apscheduler import scheduler
+from fastapi import Header, HTTPException, Depends
 from nonebot.adapters.onebot.v11 import Message, Bot
 
 
@@ -32,6 +35,42 @@ try:
     SUPERUSERS: List[int] = [int(s) for s in DRIVER.config.superusers]
 except Exception:
     SUPERUSERS = []
+
+
+requestAdaptor = """
+requestAdaptor(api) {
+    api.headers["token"] = localStorage.getItem("token");
+    return api;
+},
+"""
+responseAdaptor = """
+responseAdaptor(api, payload, query, request, response) {
+    if (response.data.detail == '登录验证失败或已失效，请重新登录') {
+        window.location.href = '/pmhelp/login'
+        window.localStorage.clear()
+        window.sessionStorage.clear()
+        window.alert('登录验证失败或已失效，请重新登录')
+    }
+    return payload
+},
+"""
+
+
+def authentication():
+    def inner(token: Optional[str] = Header(...)):
+        try:
+            payload = jwt.decode(
+                token, Pm_config.pm_secret_key, algorithms="HS256"
+            )
+            if (
+                not (username := payload.get("username"))
+                or username != Pm_config.pm_username
+            ):
+                raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
+        except (jwt.JWTError, jwt.ExpiredSignatureError, AttributeError):
+            raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
+
+    return Depends(inner)
 
 
 async def get_list(list: list, type: bool = True):

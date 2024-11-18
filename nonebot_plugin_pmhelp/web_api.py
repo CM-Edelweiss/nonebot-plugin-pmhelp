@@ -1,58 +1,23 @@
 import asyncio
 import datetime
 from jose import jwt
+import importlib.util
 try:
     import ujson as json
 except:
     import json
-from .utils import DRIVER
 from .logger import logger
-from typing import Optional
+from fastapi import FastAPI
 from .Path import USERID_ALL
 from pydantic import BaseModel
 from .pm_config import Pm_config
 from nonebot import get_app, get_adapter
+from .utils import DRIVER, requestAdaptor
 from .web_page import login_page, admin_app
 from .models import PluginDisable, PluginTime
 from nonebot.adapters.onebot.v11 import Adapter
-from fastapi import FastAPI, Header, HTTPException, Depends
 from .plugin.manage import PluginManager, PluginInfo, PluginWithdraw
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
-
-requestAdaptor = """
-requestAdaptor(api) {
-    api.headers["token"] = localStorage.getItem("token");
-    return api;
-},
-"""
-responseAdaptor = """
-responseAdaptor(api, payload, query, request, response) {
-    if (response.data.detail == '登录验证失败或已失效，请重新登录') {
-        window.location.href = '/pmhelp/login'
-        window.localStorage.clear()
-        window.sessionStorage.clear()
-        window.alert('登录验证失败或已失效，请重新登录')
-    }
-    return payload
-},
-"""
-
-
-def authentication():
-    def inner(token: Optional[str] = Header(...)):
-        try:
-            payload = jwt.decode(
-                token, Pm_config.pm_secret_key, algorithms="HS256"
-            )
-            if (
-                not (username := payload.get("username"))
-                or username != Pm_config.pm_username
-            ):
-                raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
-        except (jwt.JWTError, jwt.ExpiredSignatureError, AttributeError):
-            raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
-
-    return Depends(inner)
 
 
 class UserModel(BaseModel):
@@ -60,14 +25,17 @@ class UserModel(BaseModel):
     password: str
 
 
-try:
-    import nonebot_plugin_manageweb
-    from nonebot_plugin_manageweb.utils import responseAdaptor, authentication
-    from nonebot_plugin_manageweb.web.page.main import admin_app as admin
+spec = importlib.util.find_spec("nonebot_plugin_manageweb")
+if spec is not None:
+    from nonebot import require
+    require("nonebot_plugin_manageweb")
+    from nonebot_plugin_manageweb.utils import responseAdaptor, authentication  # type: ignore
+    from nonebot_plugin_manageweb.web.page.main import admin_app as admin  # type: ignore
     from amis import PageSchema
-    web = True
-except Exception:
-    web = False
+    mw_web = True
+else:
+    from .utils import responseAdaptor, authentication
+    mw_web = False
 
 
 @DRIVER.on_startup
@@ -77,15 +45,15 @@ async def init_web():
         return
     try:
         app: FastAPI = get_app()
-        if web:
+        if mw_web:
             logger.info(
                 "PM Web UI",
-                f"<g>启用成功</g>，已接入<m>[MW webui]</m>",
+                f"<g>启用成功</g>，已接入<m>[MW webui]http://{DRIVER.config.host}:{DRIVER.config.port}/mw/login</m>",
             )
         else:
             logger.info(
                 "PM Web UI",
-                f"<g>启用成功</g>，默认地址为<m>http://{DRIVER.config.host}:{DRIVER.config.port}/pmhelp/login</m>",
+                f"<g>启用成功</g>，地址为<m>http://{DRIVER.config.host}:{DRIVER.config.port}/pmhelp/login</m>",
             )
     except Exception as e:
         return logger.info('PM Web UI', f'启用<r>失败：{e}</r>')
@@ -387,7 +355,8 @@ async def init_web():
             'status': 0,
             'msg':    '插件信息设置成功'
         }
-    if web:
+    if mw_web:
+        # 接入mw
         admin_page = PageSchema(url='/pmhelp', icon='fa fa-gears', label='PMHELP管理器',
                                 schema=admin_app)
         admin.pages[0].children.append(admin_page)
