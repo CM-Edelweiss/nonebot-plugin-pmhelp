@@ -66,13 +66,17 @@ _✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_b
 
 <details>
 <summary>帮助图(举例)</summary>
-    橙色正常，灰色禁用，绿色使用后撤回，蓝色限流<br>
-    ![_](https://img.picui.cn/free/2024/11/09/672f2c027bd92.jpg)
+
+橙色正常，灰色禁用，绿色使用后撤回，蓝色限流
+![_](https://img.picui.cn/free/2024/11/09/672f2c027bd92.jpg)
+    
 </details>
 <details>
 <summary>webui(单独运行)</summary>
-    ![_](https://img.picui.cn/free/2024/11/15/6737330107388.png)<br>
-    ![_](https://img.picui.cn/free/2024/11/15/673732ee852a7.png)<br>
+
+![_](https://img.picui.cn/free/2024/11/15/6737330107388.png)<br>
+![_](https://img.picui.cn/free/2024/11/15/673732ee852a7.png)<br>
+
 </details>
 
 
