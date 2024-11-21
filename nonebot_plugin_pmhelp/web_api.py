@@ -6,18 +6,55 @@ try:
     import ujson as json
 except:
     import json
+from .utils import DRIVER
 from .logger import logger
-from fastapi import FastAPI
+from typing import Optional
 from .Path import USERID_ALL
 from pydantic import BaseModel
 from .pm_config import Pm_config
 from nonebot import get_app, get_adapter
-from .utils import DRIVER, requestAdaptor
 from .web_page import login_page, admin_app
 from .models import PluginDisable, PluginTime
 from nonebot.adapters.onebot.v11 import Adapter
+from fastapi import FastAPI, Header, HTTPException, Depends
 from .plugin.manage import PluginManager, PluginInfo, PluginWithdraw
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
+
+
+requestAdaptor = """
+requestAdaptor(api) {
+    api.headers["token"] = localStorage.getItem("token");
+    return api;
+},
+"""
+responseAdaptor = """
+responseAdaptor(api, payload, query, request, response) {
+    if (response.data.detail == '登录验证失败或已失效，请重新登录') {
+        window.location.href = '/pmhelp/login'
+        window.localStorage.clear()
+        window.sessionStorage.clear()
+        window.alert('登录验证失败或已失效，请重新登录')
+    }
+    return payload
+},
+"""
+
+
+def authentication():
+    def inner(token: Optional[str] = Header(...)):
+        try:
+            payload = jwt.decode(
+                token, Pm_config.pm_secret_key, algorithms="HS256"
+            )
+            if (
+                not (username := payload.get("username"))
+                or username != Pm_config.pm_username
+            ):
+                raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
+        except (jwt.JWTError, jwt.ExpiredSignatureError, AttributeError):
+            raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
+
+    return Depends(inner)
 
 
 class UserModel(BaseModel):
@@ -34,7 +71,6 @@ if spec is not None:
     from amis import PageSchema
     mw_web = True
 else:
-    from .utils import responseAdaptor, authentication
     mw_web = False
 
 

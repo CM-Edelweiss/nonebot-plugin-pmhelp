@@ -58,7 +58,7 @@ manage_cmd = on_regex(
     state={
         "pm_name": "pm-ban|unban",
         "pm_description": "禁用|取消禁用插件的群|用户使用权限/进行限流/延迟撤回",
-        "pm_usage": "pm ban|unban <中/英插件名>",
+        "pm_usage": "pm ban|unban <插件名>",
         "pm_priority": 2,
     },
 )
