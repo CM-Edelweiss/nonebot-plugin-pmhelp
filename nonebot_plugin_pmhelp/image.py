@@ -60,9 +60,6 @@ class PMImage:
     def mode(self) -> str:
         return self.image.mode
 
-    def show(self) -> None:
-        self.image.show()
-
     def convert(self, mode: str):
         return self.image.convert(mode)
 
@@ -267,7 +264,7 @@ class FontManager:
             font_name = font_name.replace('.ttf', '.ttc')
         if font_name not in self.fonts:
             raise FileNotFoundError(
-                f'不存在字体文件 {font_name} ，请补充至字体资源中,资源第一次下载请重启应用')
+                f'不存在字体文件 {font_name} ，请补充至字体资源中')
         if f'{font_name}-{size}' in self.fonts_cache:
             font = self.fonts_cache[f'{font_name}-{size}']
         else:
@@ -281,9 +278,6 @@ class FontManager:
 font_manager = FontManager()
 
 cache_image: Dict[str, Any] = {}
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36'}
-
 
 async def load_image(
         path: Union[Path, str],

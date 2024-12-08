@@ -14,6 +14,8 @@ _✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_b
 
 ## 📖 介绍
 
+~~需要一位糕手优化一下~~
+
 提供帮助图自动生成和插件权限管理<br>
 功能：全自动生成帮助图和插件禁用,限流控制<br>
 虽然LittlePaimon基本处于半死亡状态了，但是 [@CMHopeSunshine](https://github.com/CMHopeSunshine) 的插件管理器真好用，所以把LittlePaimon帮助插件独立出来用于非原神bot的使用<br>
@@ -87,6 +89,7 @@ _✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_b
 | 配置项 | 必填 | 默认值 | 说明 |
 |:-----:|:----:|:----:|:----:|
 | img_cache | 否 | True | 图片资源缓存开关 |
+| sharding_mode | 否 | False | 是否位分片模式 |
 | pm_name | 否 | NoneBot帮助 | 帮助大标题 |
 | pm_version | 否 | 11.45.14 | 帮助显示的版本号 |
 | pm_text| 否 | 自定义文本| 自定义文本 |
@@ -108,10 +111,13 @@ _✨提取于<a href="https://github.com/CMHopeSunshine/LittlePaimon" target="_b
 ```python
 举例(xxx.yml):
 description: 根据加载的nonebot2...   #插件介绍
+manage: false,                      #是否管理插件(对非管理隐藏)
 matchers:                           #帮助图展示的指令卡片(可能需要自行配置)
 - {pm_description: 禁用|取消...,     #介绍
+    pm_manage: false,               #是否管理指令(对非管理隐藏)
     pm_name: pm-ban|unban,          #此帮助名
     pm_priority: 1,                 #优先级
+    pm_sharding: true,              #不用管
     pm_show: true,                  #是否展示
     pm_usage: pm ban|unba...,       #触发命令
   }
@@ -119,6 +125,7 @@ matchers:                           #帮助图展示的指令卡片(可能需要
 module_name: nonebot_plugin_pmhelp  #插件包名
 name: PM帮助                         #插件名字
 priority: 1                          #优先级
+sharding: false                      #不用管
 show: true                           #是否展示在帮助图中
 usage: help                          #默认读取插件命令
 ```
@@ -134,6 +141,7 @@ xxx = on_command(
         "pm_description": #介绍,
         "pm_usage": #触发命令,
         "pm_priority": #优先级,
+        "pm_manage":#是否管理指令(对非管理隐藏),
     },
 )
 ```

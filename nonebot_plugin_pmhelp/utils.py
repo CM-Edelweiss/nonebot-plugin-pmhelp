@@ -3,13 +3,12 @@ import asyncio
 from pathlib import Path
 from .logger import logger
 from ruamel.yaml import YAML
-from nonebot.rule import Rule
 from nonebot import get_driver
 from typing import Union, List
+from nonebot.params import Depends
 from collections import defaultdict
-from nonebot.params import CommandArg, Depends
+from nonebot.adapters.onebot.v11 import Bot
 from nonebot_plugin_apscheduler import scheduler
-from nonebot.adapters.onebot.v11 import Message, Bot
 
 
 # 图片缓存
@@ -110,13 +109,6 @@ def CommandObjectID() -> int:
             return event.channel_id
 
     return Depends(_event_id)
-
-
-def fullmatch(msg: Message = CommandArg()) -> bool:
-    return not bool(msg)
-
-
-fullmatch_rule = Rule(fullmatch)
 
 
 class FreqLimiter:

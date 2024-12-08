@@ -16,6 +16,10 @@ class MatcherInfo(BaseModel):
     """命令优先级"""
     pm_show: bool = True
     """是否展示"""
+    pm_manage: bool = False
+    """是否为管理命令"""
+    pm_sharding: bool = True
+    """是否管理展示"""
 
 
 class PluginInfo(BaseModel):
@@ -31,7 +35,11 @@ class PluginInfo(BaseModel):
     """插件状态"""
     show: bool = True
     """是否展示"""
+    manage: bool = False
+    """管理插件"""
     priority: int = 99
     """展示优先级"""
     matchers: Optional[List[MatcherInfo]] = []
     """命令列表"""
+    sharding: bool = False
+    """是否管理展示"""

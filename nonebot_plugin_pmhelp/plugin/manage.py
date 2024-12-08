@@ -114,16 +114,42 @@ class PluginManager:
         logger.success('插件管理器', '<g>初始化完成</g>')
 
     @classmethod
-    async def get_plugin_list(cls, message_type: str, session_id: int) -> List[PluginInfo]:
+    async def get_plugin_list(cls, message_type: str, session_id: int, help: str, manage: bool = False) -> List[PluginInfo]:
         """
-        获取插件列表（供帮助图使用）
+        获取插件列表（供帮助图使用)
             :param message_type: 消息类型
             :param session_id: 消息ID
+            :param help: 分片帮助
+            :param manage: 是否展示全部插件和指令(默认隐藏)
         """
         load_plugins = [p.name for p in nb_plugin.get_loaded_plugins()]
         plugin_list = sorted(cls.plugins.values(), key=lambda x: x.priority)
-        plugin_list = [
-            p for p in plugin_list if p.show and p.module_name in load_plugins]
+
+        if manage:
+            plugin_list = [
+                p for p in plugin_list if p.show and (p.module_name in load_plugins)]
+        else:
+            plugin_list = [
+                p for p in plugin_list if p.show and (not p.manage) and (p.module_name in load_plugins)]
+
+        help_list = []
+        if help and Pm_config.sharding_mode:
+            for m in help.strip().split(" "):
+                if m in PluginManager.plugins.keys():
+                    help_list.append(m)
+                elif module_name := list(
+                    filter(
+                        lambda x: PluginManager.plugins[x].name == m,
+                        PluginManager.plugins.keys(),
+                    )
+                ):
+                    help_list.append(module_name[0])
+                else:
+                    pass
+            if help_list:
+                plugin_list = [
+                    p for p in plugin_list if p.module_name in help_list]
+
         for plugin in plugin_list:
             if await PluginDisable.filter(name=plugin.module_name, global_disable=True).exists():
                 plugin.status = "black"
@@ -152,9 +178,15 @@ class PluginManager:
                     plugin.status = "blue"
                 else:
                     plugin.status = "orange"
-
+            for i in plugin.matchers:
+                i.pm_sharding = True
+                if i.pm_manage and not manage:
+                    i.pm_sharding = False
             if plugin.matchers:
                 plugin.matchers.sort(key=lambda x: x.pm_priority)
+            plugin.sharding = False
+            if help_list:
+                plugin.sharding = True
         return plugin_list
 
     @classmethod

@@ -6,17 +6,15 @@ from .utils import (
     SUPERUSERS,
     DRIVER,
     CommandObjectID,
-    fullmatch_rule,
     cache_help,
     get_list,
 )
 from .logger import logger
-from .pm_config import Config
 # 加载web
 from . import web_api, web_page
 from .draw_help import draw_help
 from nonebot.typing import T_State
-from nonebot.params import RegexDict
+from .pm_config import Config, Pm_config
 from .plugin.manage import PluginManager
 from nonebot import on_regex, on_command
 from nonebot.plugin import PluginMetadata
@@ -24,8 +22,10 @@ from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     PrivateMessageEvent,
     MessageEvent,
+    Message,
     Bot,
 )
+from nonebot.params import RegexDict, CommandArg
 from .models import PluginDisable, PluginTime, PluginWithdraw
 
 
@@ -60,13 +60,13 @@ manage_cmd = on_regex(
         "pm_description": "禁用|取消禁用插件的群|用户使用权限/进行限流/延迟撤回",
         "pm_usage": "pm ban|unban <插件名>",
         "pm_priority": 2,
+        "pm_manage": True,
     },
 )
 help_cmd = on_command(
     "help",
     aliases={"帮助", "菜单", "pm help"},
     priority=1,
-    rule=fullmatch_rule,
     block=True,
     state={
         "pm_name": "pm-help",
@@ -337,8 +337,9 @@ async def _(state: T_State):
 
 
 @help_cmd.handle()
-async def _(event: MessageEvent, session_id: int = CommandObjectID()):
-    if session_id in cache_help:
+async def _(event: MessageEvent, session_id: int = CommandObjectID(), args: Message = CommandArg()):
+    arg = args.extract_plain_text()
+    if (session_id in cache_help) and (event.user_id not in SUPERUSERS):
         await help_cmd.finish(cache_help[session_id])
     else:
         plugin_list = await PluginManager.get_plugin_list(
@@ -352,7 +353,10 @@ async def _(event: MessageEvent, session_id: int = CommandObjectID()):
                     else event.guild_id
                 )
             ),
+            arg,
+            event.user_id in SUPERUSERS,
         )
         img = await draw_help(plugin_list)
-        cache_help[session_id] = img
-        await help_cmd.finish(img)
+        if not Pm_config.sharding_mode and (event.user_id not in SUPERUSERS):
+            cache_help[session_id] = img
+    await help_cmd.finish(img)
