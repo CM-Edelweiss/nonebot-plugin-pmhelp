@@ -11,7 +11,6 @@ from pathlib import Path
 from .Path import FONTS_PATH
 from .pm_config import Pm_config
 from nonebot.utils import run_sync
-from PIL.ImageFont import FreeTypeFont
 from PIL import Image, ImageDraw, ImageFont
 from nonebot.adapters.onebot.v11 import MessageSegment
 
@@ -41,7 +40,7 @@ class PMImage:
         else:
             if mode == 'RGB' and isinstance(color, tuple):
                 color = (color[0], color[1], color[2])
-            self.image = Image.new(mode, size, color)
+            self.image = Image.new(mode, size, color)  # type: ignore
         self.draw = ImageDraw.Draw(self.image)
 
     @property
@@ -63,7 +62,7 @@ class PMImage:
     def convert(self, mode: str):
         return self.image.convert(mode)
 
-    def save(self, path: Union[str, Path], **kwargs):
+    def save(self, path: Union[str, Path, BytesIO], **kwargs):
         """
         保存图像
 
@@ -79,10 +78,10 @@ class PMImage:
         self.image.save(bio, **kwargs)
         return bio
 
-    def text_length(self, text: str, font: ImageFont.ImageFont) -> int:
+    def text_length(self, text: str, font: Union[ImageFont.ImageFont, ImageFont.FreeTypeFont]) -> int:
         return int(self.draw.textlength(text, font))
 
-    def text_size(self, text: str, font: ImageFont.ImageFont) -> Tuple[int, int]:
+    def text_size(self, text: str, font: Union[ImageFont.ImageFont, ImageFont.FreeTypeFont]) -> Tuple[int, int]:
         return self.draw.textsize(text, font)
 
     @run_sync
@@ -115,7 +114,7 @@ class PMImage:
              text: str,
              width: Union[float, Tuple[float, float]],
              height: Union[float, Tuple[float, float]],
-             font: ImageFont.ImageFont,
+             font: Union[ImageFont.ImageFont, ImageFont.FreeTypeFont],
              color: Union[str, Tuple[int, int, int, int]] = 'white',
              align: Literal['left', 'center', 'right'] = 'left'
              ):
@@ -158,7 +157,7 @@ class PMImage:
                  text: str,
                  width: Tuple[int, int],
                  height: Tuple[int, int],
-                 font: ImageFont.ImageFont,
+                 font: Union[ImageFont.ImageFont, ImageFont.FreeTypeFont],
                  color: Union[str, Tuple[int, int, int, int]] = 'white'):
         text_height = self.draw.textbbox((0, 0), text=text, font=font)[
             3] - self.draw.textbbox((0, 0), text=text, font=font)[1]
@@ -250,7 +249,7 @@ class FontManager:
         self.fonts = fonts
         self.fonts_cache = {}
 
-    def get(self, font_name: str = 'hywh.ttf', size: int = 25, variation: Optional[str] = None) -> FreeTypeFont:
+    def get(self, font_name: str = 'hywh.ttf', size: int = 25, variation: Optional[str] = None) -> ImageFont.FreeTypeFont:
         """
         获取字体，如果已在缓存中，则直接返回
 
@@ -278,6 +277,7 @@ class FontManager:
 font_manager = FontManager()
 
 cache_image: Dict[str, Any] = {}
+
 
 async def load_image(
         path: Union[Path, str],
@@ -320,7 +320,7 @@ async def load_image(
     return img
 
 
-def MessageBuild_Image(
+async def MessageBuild_Image(
     img: Union[Image.Image, PMImage, Path, str],
     *,
     size: Optional[Union[Tuple[int, int], float]] = None,
@@ -339,7 +339,7 @@ def MessageBuild_Image(
         :return: MessageSegment.image
     """
     if isinstance(img, (str, Path)):
-        img = load_image(path=img, size=size, mode=mode, crop=crop)
+        img = await load_image(path=img, size=size, mode=mode, crop=crop)
     else:
         if isinstance(img, PMImage):
             img = img.image
@@ -356,4 +356,5 @@ def MessageBuild_Image(
     bio = BytesIO()
     img.save(bio, format='JPEG' if img.mode ==
              'RGB' else 'PNG', quality=quality)
+    bio.seek(0)
     return MessageSegment.image(bio)

@@ -350,7 +350,7 @@ async def _(event: MessageEvent, session_id: int = CommandObjectID(), args: Mess
                 else (
                     event.group_id
                     if isinstance(event, GroupMessageEvent)
-                    else event.guild_id
+                    else event.guild_id # type: ignore
                 )
             ),
             arg,

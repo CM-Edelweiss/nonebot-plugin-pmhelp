@@ -73,7 +73,7 @@ def load_yaml(path: Union[Path, str], encoding: str = 'utf-8'):
     return yaml.load(path.read_text(encoding=encoding)) if path.exists() else {}
 
 
-def save_yaml(data: dict, path: Union[Path, str] = None, encoding: str = 'utf-8'):
+def save_yaml(data: dict, path: Union[Path, str], encoding: str = 'utf-8'):
     """
     保存yaml文件
 

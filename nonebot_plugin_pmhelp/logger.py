@@ -9,7 +9,7 @@ class logger:
     """
 
     @staticmethod
-    def info(command: str, info: str = '', param: Dict[str, any] = None, result: str = '', result_type: bool = True):
+    def info(command: str, info: str = '', param: Dict[str, any] = None, result: str = '', result_type: bool = True): # type: ignore
         param_str = ' '.join(
             [f'{k}<m>{escape_tag(str(v))}</m>' for k, v in param.items()]) if param else ''
         result_str = f'<g>{escape_tag(result)}</g>' if result_type else f'<r>{escape_tag(result)}</r>' if result else ''
@@ -17,7 +17,7 @@ class logger:
             f'<u><y>[{command}]</y></u>{info}{param_str}{result_str}')
 
     @staticmethod
-    def success(command: str, info: str = '', param: Dict[str, any] = None, result: str = ''):
+    def success(command: str, info: str = '', param: Dict[str, any] = None, result: str = ''): # type: ignore
         param_str = ' '.join(
             [f'{k}<m>{escape_tag(str(v))}</m>' for k, v in param.items()]) if param else ''
         result_str = f'<g>{escape_tag(result)}</g>' if result else ''

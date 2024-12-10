@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-from jose import jwt
 import importlib.util
 try:
     import ujson as json
@@ -16,6 +15,7 @@ from nonebot import get_app, get_adapter
 from .web_page import login_page, admin_app
 from .models import PluginDisable, PluginTime
 from nonebot.adapters.onebot.v11 import Adapter
+from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi import FastAPI, Header, HTTPException, Depends
 from .plugin.manage import PluginManager, PluginInfo, PluginWithdraw
 from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
@@ -43,6 +43,8 @@ responseAdaptor(api, payload, query, request, response) {
 def authentication():
     def inner(token: Optional[str] = Header(...)):
         try:
+            if not token:
+                raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
             payload = jwt.decode(
                 token, Pm_config.pm_secret_key, algorithms="HS256"
             )
@@ -51,7 +53,7 @@ def authentication():
                 or username != Pm_config.pm_username
             ):
                 raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
-        except (jwt.JWTError, jwt.ExpiredSignatureError, AttributeError):
+        except (JWTError, ExpiredSignatureError, AttributeError):
             raise HTTPException(status_code=400, detail="登录验证失败或已失效，请重新登录")
 
     return Depends(inner)
@@ -207,13 +209,15 @@ async def init_web():
     @app.post('/pmhelp/api/set_plugin_status', response_class=JSONResponse, dependencies=[authentication()])
     async def set_plugin_status(data: dict):
         """保存插件禁用状态api（全局）"""
-        module_name: str = data.get('plugin')
-        status: bool = data.get('status')
+        module_name: str = data.get('plugin', '')
+        status: bool = data.get('status', False)
         try:
             from .utils import cache_help
             cache_help.clear()
         except Exception:
             pass
+        if module_name == '':
+            return {'status': -100, 'msg': '插件名为空'}
         if status:
             await PluginDisable.filter(name=module_name, global_disable=True).delete()
         else:

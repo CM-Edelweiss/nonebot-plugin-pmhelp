@@ -139,4 +139,4 @@ async def draw_help(plugin_list: List[PluginInfo]):
     await bg.paste(img, (0, 0))
 
     # 返回最终的帮助图片
-    return MessageBuild_Image(bg, quality=80, mode='RGB')
+    return await MessageBuild_Image(bg, quality=80, mode='RGB')

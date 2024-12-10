@@ -84,8 +84,8 @@ login_body = Wrapper(className="w-2/5 mx-auto my-0 m:w-full", body=Form(
         ),
     ],
     mode=DisplayModeEnum.horizontal,
-    style=rounded_css_9,
-    actions=[Action(label='登录', level=LevelEnum.primary, type='submit', style={
+    style=rounded_css_9,  # type: ignore
+    actions=[Action(label='登录', level=LevelEnum.primary, type='submit', style={  # type: ignore
         "display": "table",
         "margin": "0 auto",
         "border-radius": "2em",
@@ -94,7 +94,8 @@ login_body = Wrapper(className="w-2/5 mx-auto my-0 m:w-full", body=Form(
     redirect="/pmhelp/admin",
 ))
 
-login_page = Page(title="", body=login_body, style=background_css)
+login_page = Page(title="", body=login_body,
+                  style=background_css)  # type: ignore
 
 # -------------禁用-------------------#
 ban_form = Form(title='',
@@ -282,7 +283,7 @@ card = Card(
                        avatarText='$name',
                        avatarTextClassName='overflow-hidden'),
     actions=[detail_button, permission_button, xl_button, withdraw_button],
-    style=rounded_css_curd,
+    style=rounded_css_curd,  # type: ignore
     className='m-l',
     toolbar=[
         Tpl(tpl='未加载', className='label label-warning', hiddenOn='${isLoad}'),
@@ -334,7 +335,7 @@ cards_curd = CardsCRUD(mode='cards',
                            "style": rounded_css_9,
                            "mode": DisplayModeEnum.inline
                        },
-                       style=rounded_css_8,
+                       style=rounded_css_8,  # type: ignore
                        perPage=12,
                        autoJumpToTopOnPagerChange=True,
                        placeholder='暂无插件信息',
@@ -350,4 +351,5 @@ cards_curd = CardsCRUD(mode='cards',
                        footerToolbar=[],
                        card=card)
 
-admin_app = Page(title="PMHELP插件管理器", body=cards_curd, style=background_css)
+admin_app = Page(title="PMHELP插件管理器", body=cards_curd,
+                 style=background_css)  # type: ignore
