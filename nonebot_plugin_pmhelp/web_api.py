@@ -408,7 +408,6 @@ async def init_web():
         @app.get("/pmhelp/login", response_class=HTMLResponse)
         async def login_page_app():
             return login_page.render(
-                cdn='https://npm.onmicrosoft.cn',
                 site_title="登录 | PMHELP 后台管理",
                 site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
                 theme="ang"
@@ -417,7 +416,6 @@ async def init_web():
         @app.get("/pmhelp/admin", response_class=HTMLResponse)
         async def admin_page_app():
             return admin_app.render(
-                cdn="https://npm.onmicrosoft.cn",
                 site_title="PMHELP 后台管理",
                 site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
                 theme="ang",

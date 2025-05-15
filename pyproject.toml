@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nonebot-plugin-pmhelp"
-version = "1.4.2"
+version = "1.4.3"
 description = "源于LittlePaimon的插件管理器插件，提供自动生成帮助图，并对群/私聊进行权限管理"
 authors = ["CM-Edelweiss <2633668472@qq.com>"]
 readme = "README.md"
@@ -18,7 +18,7 @@ nonebot-plugin-tortoise-orm = ">=0.1.1"
 nonebot-plugin-apscheduler = "^0.5.0"
 ujson = "^5.4.0"
 Pillow = "^9.1.0"
-amis-python = "^1.0.6"
+amis-py-model = "^1.0.0"
 python-jose = "^3.3.0"
 matplotlib = "^3.5.1"
 tqdm = "^4.64.0"
