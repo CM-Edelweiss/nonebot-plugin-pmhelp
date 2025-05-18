@@ -27,6 +27,8 @@ class Config(BaseModel):
     pm_password: str = "admin"
     # 后台管理token密钥
     pm_secret_key: str = "r99nxsvr93a5i241mvisjydxspiwxgpiyoh9nas35036fkxd7y"
+    # 后台管理cdn地址
+    pm_cdn:str = "https://npm.onmicrosoft.cn/"
 
 
 Pm_config: Config = get_plugin_config(Config)

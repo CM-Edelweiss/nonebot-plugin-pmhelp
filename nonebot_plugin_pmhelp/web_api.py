@@ -409,6 +409,7 @@ async def init_web():
         async def login_page_app():
             return login_page.render(
                 site_title="登录 | PMHELP 后台管理",
+                cdn=Pm_config.pm_cdn,
                 site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
                 theme="ang"
             )
@@ -417,6 +418,7 @@ async def init_web():
         async def admin_page_app():
             return admin_app.render(
                 site_title="PMHELP 后台管理",
+                cdn=Pm_config.pm_cdn,
                 site_icon="https://img.picui.cn/free/2024/10/28/671f78556a9ee.png",
                 theme="ang",
                 requestAdaptor=requestAdaptor,
